@@ -5,7 +5,7 @@ authors = ["Andrew Walbran <qwandor@google.com>", "David Laban <alsuren@gmail.co
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "Generated async D-Bus bindings for talking to BlueZ on Linux."
-repository = "https://github.com/alsuren/mijia-homie/"
+repository = "https://github.com/bluez-rs/bluez-async/"
 keywords = ["bluetooth", "ble", "bluez", "dbus"]
 categories = ["api-bindings", "os::linux-apis"]
 

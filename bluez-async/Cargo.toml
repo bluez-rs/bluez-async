@@ -5,7 +5,7 @@ authors = ["Andrew Walbran <qwandor@google.com>", "David Laban <alsuren@gmail.co
 edition = "2018"
 license = "MIT OR Apache-2.0"
 description = "An async wrapper around the D-Bus interface of BlueZ (the Linux Bluetooth daemon), supporting GATT client (central) functionality."
-repository = "https://github.com/alsuren/mijia-homie/"
+repository = "https://github.com/bluez-rs/bluez-async/"
 keywords = ["ble", "bluetooth", "bluez"]
 categories = ["api-bindings", "hardware-support", "os::linux-apis"]
 
