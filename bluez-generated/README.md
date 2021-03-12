@@ -13,7 +13,7 @@ maintain, but it only covers interfaces that I have the devices for.
 
 If there is an interface that you need which is not generated, it should be reasonably
 straightforward to generate them and send a pull request. See
-[introspect.sh](https://github.com/alsuren/mijia-homie/blob/master/bluez-generated/introspect.sh)
+[introspect.sh](https://github.com/bluez-rs/bluez-async/blob/main/bluez-generated/introspect.sh)
 for details. It's also perfectly reasonable to generate the interfaces you need and vendor them into
 your project.
 
