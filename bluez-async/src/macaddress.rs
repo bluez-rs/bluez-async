@@ -132,4 +132,19 @@ mod tests {
             "AB:CD:EF:44:55:66".to_string()
         );
     }
+
+    #[test]
+    fn format() {
+        let mac_address = MacAddress([0x12, 0x34, 0x56, 0xab, 0xcd, 0xef]);
+
+        assert_eq!(format!("{}", mac_address), "12:34:56:AB:CD:EF".to_string());
+        assert_eq!(
+            format!("{:X}", mac_address),
+            "12:34:56:AB:CD:EF".to_string()
+        );
+        assert_eq!(
+            format!("{:x}", mac_address),
+            "12:34:56:ab:cd:ef".to_string()
+        );
+    }
 }
