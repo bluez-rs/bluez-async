@@ -70,4 +70,15 @@ mod tests {
         );
         assert_eq!(descriptor_id.characteristic(), characteristic_id);
     }
+
+    #[test]
+    fn to_string() {
+        let descriptor_id = DescriptorId::new(
+            "/org/bluez/hci0/dev_11_22_33_44_55_66/service0022/char0033/desc0034",
+        );
+        assert_eq!(
+            descriptor_id.to_string(),
+            "hci0/dev_11_22_33_44_55_66/service0022/char0033/desc0034".to_string()
+        );
+    }
 }

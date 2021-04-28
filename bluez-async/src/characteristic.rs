@@ -146,4 +146,14 @@ mod tests {
             matches!(flags, Err(BluetoothError::FlagParseError(string)) if string == "invalid flag")
         );
     }
+
+    #[test]
+    fn to_string() {
+        let characteristic_id =
+            CharacteristicId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0022/char0033");
+        assert_eq!(
+            characteristic_id.to_string(),
+            "hci0/dev_11_22_33_44_55_66/service0022/char0033".to_string()
+        );
+    }
 }

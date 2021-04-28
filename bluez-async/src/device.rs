@@ -249,6 +249,15 @@ mod tests {
     }
 
     #[test]
+    fn to_string() {
+        let device_id = DeviceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66");
+        assert_eq!(
+            device_id.to_string(),
+            "hci0/dev_11_22_33_44_55_66".to_string()
+        );
+    }
+
+    #[test]
     fn service_data() {
         let uuid = uuid_from_u32(0x11223344);
         let mut service_data: PropMap = HashMap::new();

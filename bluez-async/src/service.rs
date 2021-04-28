@@ -68,4 +68,13 @@ mod tests {
         let service_id = ServiceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0022");
         assert_eq!(service_id.device(), device_id);
     }
+
+    #[test]
+    fn to_string() {
+        let service_id = ServiceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0022");
+        assert_eq!(
+            service_id.to_string(),
+            "hci0/dev_11_22_33_44_55_66/service0022".to_string()
+        );
+    }
 }
