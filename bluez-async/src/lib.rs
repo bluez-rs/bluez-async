@@ -68,10 +68,10 @@ pub enum BluetoothError {
     XmlParseError(#[from] serde_xml_rs::Error),
     /// No service or characteristic was found for some UUID.
     #[error("Service or characteristic UUID {uuid} not found.")]
-    UUIDNotFound { uuid: Uuid },
+    UuidNotFound { uuid: Uuid },
     /// Error parsing a UUID from a string.
     #[error("Error parsing UUID string: {0}")]
-    UUIDParseError(#[from] uuid::Error),
+    UuidParseError(#[from] uuid::Error),
     /// Error parsing a characteristic flag from a string.
     #[error("Invalid characteristic flag {0:?}")]
     FlagParseError(String),
@@ -149,38 +149,38 @@ pub struct DiscoveryFilter {
     pub pattern: Option<String>,
 }
 
-impl Into<PropMap> for &DiscoveryFilter {
-    fn into(self) -> PropMap {
+impl From<&DiscoveryFilter> for PropMap {
+    fn from(filter: &DiscoveryFilter) -> Self {
         let mut map: PropMap = HashMap::new();
-        if !self.service_uuids.is_empty() {
-            let uuids: Vec<String> = self.service_uuids.iter().map(Uuid::to_string).collect();
+        if !filter.service_uuids.is_empty() {
+            let uuids: Vec<String> = filter.service_uuids.iter().map(Uuid::to_string).collect();
             map.insert("UUIDs".to_string(), Variant(Box::new(uuids)));
         }
-        if let Some(rssi_threshold) = self.rssi_threshold {
+        if let Some(rssi_threshold) = filter.rssi_threshold {
             map.insert("RSSI".to_string(), Variant(Box::new(rssi_threshold)));
         }
-        if let Some(pathloss_threshold) = self.pathloss_threshold {
+        if let Some(pathloss_threshold) = filter.pathloss_threshold {
             map.insert(
                 "Pathloss".to_string(),
                 Variant(Box::new(pathloss_threshold)),
             );
         }
-        if let Some(transport) = self.transport {
+        if let Some(transport) = filter.transport {
             map.insert(
                 "Transport".to_string(),
                 Variant(Box::new(transport.to_string())),
             );
         }
-        if let Some(duplicate_data) = self.duplicate_data {
+        if let Some(duplicate_data) = filter.duplicate_data {
             map.insert(
                 "DuplicateData".to_string(),
                 Variant(Box::new(duplicate_data)),
             );
         }
-        if let Some(discoverable) = self.discoverable {
+        if let Some(discoverable) = filter.discoverable {
             map.insert("Discoverable".to_string(), Variant(Box::new(discoverable)));
         }
-        if let Some(pattern) = &self.pattern {
+        if let Some(pattern) = &filter.pattern {
             map.insert("Pattern".to_string(), Variant(Box::new(pattern.to_owned())));
         }
         map
@@ -233,13 +233,16 @@ pub struct WriteOptions {
     pub write_type: Option<WriteType>,
 }
 
-impl Into<PropMap> for WriteOptions {
-    fn into(self) -> PropMap {
+impl From<WriteOptions> for PropMap {
+    fn from(options: WriteOptions) -> Self {
         let mut map: PropMap = HashMap::new();
-        if self.offset != 0 {
-            map.insert("offset".to_string(), Variant(Box::new(self.offset as u64)));
+        if options.offset != 0 {
+            map.insert(
+                "offset".to_string(),
+                Variant(Box::new(options.offset as u64)),
+            );
         }
-        if let Some(write_type) = self.write_type {
+        if let Some(write_type) = options.write_type {
             map.insert(
                 "type".to_string(),
                 Variant(Box::new(write_type.to_string())),
@@ -278,10 +281,7 @@ impl BluetoothSession {
             let err = dbus_resource.await;
             Err(SpawnError::DbusConnectionLost(err))
         });
-        Ok((
-            dbus_handle.map(|res| Ok(res??)),
-            BluetoothSession { connection },
-        ))
+        Ok((dbus_handle.map(|res| res?), BluetoothSession { connection }))
     }
 
     /// Power on all Bluetooth adapters, remove any discovery filter, and then start scanning for
@@ -528,7 +528,7 @@ impl BluetoothSession {
         services
             .into_iter()
             .find(|service_info| service_info.uuid == uuid)
-            .ok_or(BluetoothError::UUIDNotFound { uuid })
+            .ok_or(BluetoothError::UuidNotFound { uuid })
     }
 
     /// Find a characteristic with the given UUID as part of the given GATT service advertised by a
@@ -542,7 +542,7 @@ impl BluetoothSession {
         characteristics
             .into_iter()
             .find(|characteristic_info| characteristic_info.uuid == uuid)
-            .ok_or(BluetoothError::UUIDNotFound { uuid })
+            .ok_or(BluetoothError::UuidNotFound { uuid })
     }
 
     /// Convenience method to get a GATT charactacteristic with the given UUID advertised by a

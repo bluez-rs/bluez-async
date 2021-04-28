@@ -58,7 +58,7 @@ pub enum DeviceEvent {
     /// The device has connected or disconnected.
     Connected { connected: bool },
     /// A new value is available for the RSSI of the device.
-    RSSI { rssi: i16 },
+    Rssi { rssi: i16 },
     /// A new value is available for the manufacturer-specific advertisement data of the device.
     ManufacturerData {
         /// The manufacturer-specific advertisement data. The keys are 'manufacturer IDs'.
@@ -195,7 +195,7 @@ impl BluetoothEvent {
                 if let Some(rssi) = device.rssi() {
                     events.push(BluetoothEvent::Device {
                         id: id.clone(),
-                        event: DeviceEvent::RSSI { rssi },
+                        event: DeviceEvent::Rssi { rssi },
                     });
                 }
                 if let Some(manufacturer_data) = device.manufacturer_data() {
@@ -277,7 +277,7 @@ mod tests {
             BluetoothEvent::message_to_events(message),
             vec![BluetoothEvent::Device {
                 id,
-                event: DeviceEvent::RSSI { rssi }
+                event: DeviceEvent::Rssi { rssi }
             }]
         )
     }

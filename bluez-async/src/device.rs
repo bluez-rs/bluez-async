@@ -221,7 +221,7 @@ fn get_services(device_properties: OrgBluezDevice1Properties) -> Vec<Uuid> {
     }
 }
 
-pub(crate) fn convert_services(uuids: &Vec<String>) -> Vec<Uuid> {
+pub(crate) fn convert_services(uuids: &[String]) -> Vec<Uuid> {
     uuids
         .iter()
         .filter_map(|uuid| {

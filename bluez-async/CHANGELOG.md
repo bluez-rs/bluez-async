@@ -5,6 +5,7 @@
 ### Breaking changes
 
 - More helpful errors for parsing `MacAddress`.
+- Acronyms no longer upper-case.
 
 ### New features
 
