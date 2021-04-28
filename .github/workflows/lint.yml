@@ -9,13 +9,6 @@ env:
   dbus-codegen-version: 0.9.1
 
 jobs:
-  shellcheck:
-    name: Shellcheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
   generated:
     name: Check that generated files haven't been modified
     runs-on: ubuntu-latest
