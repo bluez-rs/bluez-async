@@ -251,10 +251,7 @@ mod tests {
     #[test]
     fn to_string() {
         let device_id = DeviceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66");
-        assert_eq!(
-            device_id.to_string(),
-            "hci0/dev_11_22_33_44_55_66".to_string()
-        );
+        assert_eq!(device_id.to_string(), "hci0/dev_11_22_33_44_55_66");
     }
 
     #[test]

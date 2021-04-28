@@ -153,7 +153,7 @@ mod tests {
             CharacteristicId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0022/char0033");
         assert_eq!(
             characteristic_id.to_string(),
-            "hci0/dev_11_22_33_44_55_66/service0022/char0033".to_string()
+            "hci0/dev_11_22_33_44_55_66/service0022/char0033"
         );
     }
 }

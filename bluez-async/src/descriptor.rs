@@ -78,7 +78,7 @@ mod tests {
         );
         assert_eq!(
             descriptor_id.to_string(),
-            "hci0/dev_11_22_33_44_55_66/service0022/char0033/desc0034".to_string()
+            "hci0/dev_11_22_33_44_55_66/service0022/char0033/desc0034"
         );
     }
 }
