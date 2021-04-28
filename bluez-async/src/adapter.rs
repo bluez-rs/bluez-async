@@ -128,4 +128,10 @@ mod tests {
             }
         )
     }
+
+    #[test]
+    fn to_string() {
+        let adapter_id = AdapterId::new("/org/bluez/hci0");
+        assert_eq!(adapter_id.to_string(), "hci0");
+    }
 }
