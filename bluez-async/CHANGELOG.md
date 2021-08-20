@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
 ### Breaking changes
 
@@ -10,6 +10,11 @@
 ### New features
 
 - `MacAddress` is now `Copy`, and can be formatted in upper or lower case.
+- `MacAddress` can be converted to and from a byte array.
+
+### Other changes
+
+- Moved out of the mijia-homie repository to a new separate repository.
 
 ## 0.3.1
 
