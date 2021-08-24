@@ -28,6 +28,7 @@ pub trait OrgBluezAdapter1 {
     fn discovering(&self) -> nonblock::MethodReply<bool>;
     fn uuids(&self) -> nonblock::MethodReply<Vec<String>>;
     fn modalias(&self) -> nonblock::MethodReply<String>;
+    fn roles(&self) -> nonblock::MethodReply<Vec<String>>;
 }
 
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezAdapter1
@@ -158,6 +159,14 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezA
         )
     }
 
+    fn roles(&self) -> nonblock::MethodReply<Vec<String>> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
+            &self,
+            "org.bluez.Adapter1",
+            "Roles",
+        )
+    }
+
     fn set_alias(&self, value: String) -> nonblock::MethodReply<()> {
         <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::set(
             &self,
@@ -275,5 +284,9 @@ impl<'a> OrgBluezAdapter1Properties<'a> {
 
     pub fn modalias(&self) -> Option<&String> {
         arg::prop_cast(self.0, "Modalias")
+    }
+
+    pub fn roles(&self) -> Option<&Vec<String>> {
+        arg::prop_cast(self.0, "Roles")
     }
 }

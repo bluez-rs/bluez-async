@@ -60,9 +60,6 @@
       <arg name="invalidated_properties" type="as"/>
     </signal>
   </interface>
-  <interface name="org.bluez.Battery1">
-    <property name="Percentage" type="y" access="read"/>
-  </interface>
   <interface name="org.bluez.MediaControl1">
     <method name="Play">
       <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>

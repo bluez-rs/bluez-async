@@ -22,6 +22,8 @@ pub mod leadvertisingmanager1;
 pub use leadvertisingmanager1::*;
 pub mod media1;
 pub use media1::*;
+pub mod mediacontrol1;
+pub use mediacontrol1::*;
 pub mod networkserver1;
 pub use networkserver1::*;
 pub mod profilemanager1;

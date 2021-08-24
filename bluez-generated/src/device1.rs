@@ -37,6 +37,8 @@ pub trait OrgBluezDevice1 {
     fn service_data(&self) -> nonblock::MethodReply<arg::PropMap>;
     fn tx_power(&self) -> nonblock::MethodReply<i16>;
     fn services_resolved(&self) -> nonblock::MethodReply<bool>;
+    fn wake_allowed(&self) -> nonblock::MethodReply<bool>;
+    fn set_wake_allowed(&self, value: bool) -> nonblock::MethodReply<()>;
 }
 
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezDevice1
@@ -230,6 +232,14 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezD
         )
     }
 
+    fn wake_allowed(&self) -> nonblock::MethodReply<bool> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
+            &self,
+            "org.bluez.Device1",
+            "WakeAllowed",
+        )
+    }
+
     fn set_alias(&self, value: String) -> nonblock::MethodReply<()> {
         <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::set(
             &self,
@@ -253,6 +263,15 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezD
             &self,
             "org.bluez.Device1",
             "Blocked",
+            value,
+        )
+    }
+
+    fn set_wake_allowed(&self, value: bool) -> nonblock::MethodReply<()> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::set(
+            &self,
+            "org.bluez.Device1",
+            "WakeAllowed",
             value,
         )
     }
@@ -351,5 +370,9 @@ impl<'a> OrgBluezDevice1Properties<'a> {
 
     pub fn services_resolved(&self) -> Option<bool> {
         arg::prop_cast(self.0, "ServicesResolved").copied()
+    }
+
+    pub fn wake_allowed(&self) -> Option<bool> {
+        arg::prop_cast(self.0, "WakeAllowed").copied()
     }
 }

@@ -13,6 +13,7 @@ pub trait OrgBluezLEAdvertisingManager1 {
     fn active_instances(&self) -> nonblock::MethodReply<u8>;
     fn supported_instances(&self) -> nonblock::MethodReply<u8>;
     fn supported_includes(&self) -> nonblock::MethodReply<Vec<String>>;
+    fn supported_secondary_channels(&self) -> nonblock::MethodReply<Vec<String>>;
 }
 
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezLEAdvertisingManager1
@@ -61,6 +62,14 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezL
             "SupportedIncludes",
         )
     }
+
+    fn supported_secondary_channels(&self) -> nonblock::MethodReply<Vec<String>> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
+            &self,
+            "org.bluez.LEAdvertisingManager1",
+            "SupportedSecondaryChannels",
+        )
+    }
 }
 
 pub const ORG_BLUEZ_LEADVERTISING_MANAGER1_NAME: &str = "org.bluez.LEAdvertisingManager1";
@@ -85,5 +94,9 @@ impl<'a> OrgBluezLEAdvertisingManager1Properties<'a> {
 
     pub fn supported_includes(&self) -> Option<&Vec<String>> {
         arg::prop_cast(self.0, "SupportedIncludes")
+    }
+
+    pub fn supported_secondary_channels(&self) -> Option<&Vec<String>> {
+        arg::prop_cast(self.0, "SupportedSecondaryChannels")
     }
 }

@@ -31,6 +31,7 @@
     <property name="Discovering" type="b" access="read"/>
     <property name="UUIDs" type="as" access="read"/>
     <property name="Modalias" type="s" access="read"/>
+    <property name="Roles" type="as" access="read"/>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
@@ -73,6 +74,7 @@
     <property name="ActiveInstances" type="y" access="read"/>
     <property name="SupportedInstances" type="y" access="read"/>
     <property name="SupportedIncludes" type="as" access="read"/>
+    <property name="SupportedSecondaryChannels" type="as" access="read"/>
   </interface>
   <interface name="org.bluez.Media1">
     <method name="RegisterEndpoint">
@@ -88,6 +90,13 @@
     </method>
     <method name="UnregisterPlayer">
       <arg name="player" type="o" direction="in"/>
+    </method>
+    <method name="RegisterApplication">
+      <arg name="application" type="o" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+    </method>
+    <method name="UnregisterApplication">
+      <arg name="application" type="o" direction="in"/>
     </method>
   </interface>
   <interface name="org.bluez.NetworkServer1">

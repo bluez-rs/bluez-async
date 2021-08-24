@@ -16,6 +16,12 @@ pub trait OrgBluezMedia1 {
         properties: arg::PropMap,
     ) -> nonblock::MethodReply<()>;
     fn unregister_player(&self, player: dbus::Path) -> nonblock::MethodReply<()>;
+    fn register_application(
+        &self,
+        application: dbus::Path,
+        options: arg::PropMap,
+    ) -> nonblock::MethodReply<()>;
+    fn unregister_application(&self, application: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezMedia1
@@ -47,6 +53,22 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezM
 
     fn unregister_player(&self, player: dbus::Path) -> nonblock::MethodReply<()> {
         self.method_call("org.bluez.Media1", "UnregisterPlayer", (player,))
+    }
+
+    fn register_application(
+        &self,
+        application: dbus::Path,
+        options: arg::PropMap,
+    ) -> nonblock::MethodReply<()> {
+        self.method_call(
+            "org.bluez.Media1",
+            "RegisterApplication",
+            (application, options),
+        )
+    }
+
+    fn unregister_application(&self, application: dbus::Path) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.Media1", "UnregisterApplication", (application,))
     }
 }
 
