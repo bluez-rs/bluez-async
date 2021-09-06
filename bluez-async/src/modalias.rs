@@ -2,8 +2,12 @@ use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
+use thiserror::Error;
 
-use crate::BluetoothError;
+/// An error parsing a [`Modalias`] from a string.
+#[derive(Clone, Debug, Error, Eq, PartialEq)]
+#[error("Error parsing modalias string {0:?}")]
+pub struct ParseModaliasError(String);
 
 /// A parsed modalias string.
 ///
@@ -26,12 +30,12 @@ impl Display for Modalias {
 }
 
 impl FromStr for Modalias {
-    type Err = BluetoothError;
+    type Err = ParseModaliasError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         RawModalias::from_str(s)?
             .try_into()
-            .map_err(|_| BluetoothError::ModaliasParseError(s.to_owned()))
+            .map_err(|_| ParseModaliasError(s.to_owned()))
     }
 }
 
@@ -60,7 +64,7 @@ struct RawModalias {
 }
 
 impl FromStr for RawModalias {
-    type Err = BluetoothError;
+    type Err = ParseModaliasError;
 
     fn from_str(s: &str) -> Result<RawModalias, Self::Err> {
         if let Some((subtype, mut rest)) = s.split_once(':') {
@@ -92,7 +96,7 @@ impl FromStr for RawModalias {
                 values,
             })
         } else {
-            Err(BluetoothError::ModaliasParseError(s.to_owned()))
+            Err(ParseModaliasError(s.to_owned()))
         }
     }
 }
@@ -125,7 +129,7 @@ mod tests {
     fn parse_invalid_subtype() {
         assert!(matches!(
             Modalias::from_str("blah:v0000p0000d0000"),
-            Err(BluetoothError::ModaliasParseError(_))
+            Err(ParseModaliasError(_))
         ));
     }
 
@@ -133,11 +137,11 @@ mod tests {
     fn parse_missing_fields() {
         assert!(matches!(
             Modalias::from_str("usb:"),
-            Err(BluetoothError::ModaliasParseError(_))
+            Err(ParseModaliasError(_))
         ));
         assert!(matches!(
             Modalias::from_str("usb:v1234p5678"),
-            Err(BluetoothError::ModaliasParseError(_))
+            Err(ParseModaliasError(_))
         ));
     }
 
@@ -167,7 +171,7 @@ mod tests {
     fn parse_raw_empty() {
         assert!(matches!(
             RawModalias::from_str(""),
-            Err(BluetoothError::ModaliasParseError(_))
+            Err(ParseModaliasError(_))
         ));
     }
 

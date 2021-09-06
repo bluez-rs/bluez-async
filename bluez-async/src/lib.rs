@@ -28,7 +28,7 @@ pub use self::events::{AdapterEvent, BluetoothEvent, CharacteristicEvent, Device
 use self::introspect::IntrospectParse;
 pub use self::macaddress::{MacAddress, ParseMacAddressError};
 use self::messagestream::MessageStream;
-pub use self::modalias::Modalias;
+pub use self::modalias::{Modalias, ParseModaliasError};
 pub use self::service::{ServiceId, ServiceInfo};
 use bluez_generated::{
     OrgBluezAdapter1, OrgBluezAdapter1Properties, OrgBluezDevice1, OrgBluezDevice1Properties,
@@ -90,8 +90,8 @@ pub enum BluetoothError {
     #[error(transparent)]
     MacAddressParseError(#[from] ParseMacAddressError),
     /// Error parsing a `Modalias` from a string.
-    #[error("Error parsing modalias string {0:?}")]
-    ModaliasParseError(String),
+    #[error(transparent)]
+    ModaliasParseError(#[from] ParseModaliasError),
 }
 
 /// Error type for futures representing tasks spawned by this crate.
