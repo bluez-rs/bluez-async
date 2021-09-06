@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Breaking changes
+
+- Added modalias to `AdapterInfo`.
+
 ## 0.4.0
 
 ### Breaking changes
