@@ -2,6 +2,7 @@ use bluez_generated::OrgBluezAdapter1Properties;
 use dbus::Path;
 use std::fmt::{self, Display, Formatter};
 
+use crate::Modalias;
 use crate::{AddressType, BluetoothError, MacAddress};
 
 /// Opaque identifier for a Bluetooth adapter on the system.
@@ -44,6 +45,8 @@ pub struct AdapterInfo {
     pub name: String,
     /// The Bluetooth friendly name. This defaults to the system hostname.
     pub alias: String,
+    /// Information about the Bluetooth adapter, mostly useful for debug purposes.
+    pub modalias: Modalias,
     /// Whether the adapter is currently turned on.
     pub powered: bool,
     /// Whether the adapter is currently discovering devices.
@@ -63,6 +66,10 @@ impl AdapterInfo {
             .address_type()
             .ok_or(BluetoothError::RequiredPropertyMissing("AddressType"))?
             .parse()?;
+        let modalias = adapter_properties
+            .modalias()
+            .ok_or(BluetoothError::RequiredPropertyMissing("Modalias"))?
+            .parse()?;
 
         Ok(AdapterInfo {
             id,
@@ -76,6 +83,7 @@ impl AdapterInfo {
                 .alias()
                 .ok_or(BluetoothError::RequiredPropertyMissing("Alias"))?
                 .to_owned(),
+            modalias,
             powered: adapter_properties
                 .powered()
                 .ok_or(BluetoothError::RequiredPropertyMissing("Powered"))?,
@@ -107,6 +115,10 @@ mod tests {
         );
         adapter_properties.insert("Name".to_string(), Variant(Box::new("name".to_string())));
         adapter_properties.insert("Alias".to_string(), Variant(Box::new("alias".to_string())));
+        adapter_properties.insert(
+            "Modalias".to_string(),
+            Variant(Box::new("usb:v1234p5678d90AB".to_string())),
+        );
         adapter_properties.insert("Powered".to_string(), Variant(Box::new(false)));
         adapter_properties.insert("Discovering".to_string(), Variant(Box::new(false)));
 
@@ -123,6 +135,11 @@ mod tests {
                 address_type: AddressType::Public,
                 name: "name".to_string(),
                 alias: "alias".to_string(),
+                modalias: Modalias {
+                    vendor_id: 0x1234,
+                    product_id: 0x5678,
+                    device_id: 0x90ab
+                },
                 powered: false,
                 discovering: false
             }
