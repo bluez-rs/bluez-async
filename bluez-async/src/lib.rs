@@ -283,6 +283,9 @@ impl BluetoothSession {
     ) -> Result<(impl Future<Output = Result<(), SpawnError>>, Self), BluetoothError> {
         // Connect to the D-Bus system bus (this is blocking, unfortunately).
         let (dbus_resource, connection) = dbus_tokio::connection::new_system_sync()?;
+        // Configure the connection to send signal messages to all matching `MsgMatch`es, as we may
+        // have streams with overlapping match rules.
+        connection.set_signal_match_mode(true);
         // The resource is a task that should be spawned onto a tokio compatible
         // reactor ASAP. If the resource ever finishes, you lost connection to D-Bus.
         let dbus_handle = tokio::spawn(async {

@@ -10,6 +10,10 @@
 
 - Added `BluetoothSession::connect_with_timeout` method.
 
+### Bugfixes
+
+- Fixed bug where if there were multiple event streams, only one would get each event.
+
 ## 0.4.0
 
 ### Breaking changes
