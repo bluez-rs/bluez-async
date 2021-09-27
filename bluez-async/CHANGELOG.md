@@ -6,6 +6,10 @@
 
 - Added modalias to `AdapterInfo`.
 
+### New features
+
+- Added `BluetoothSession::connect_with_timeout` method.
+
 ## 0.4.0
 
 ### Breaking changes
