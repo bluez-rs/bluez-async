@@ -54,6 +54,9 @@ use tokio::time::timeout;
 use uuid::Uuid;
 
 const DBUS_METHOD_CALL_TIMEOUT: Duration = Duration::from_secs(30);
+// in dbus C lib the max value is #define DBUS_TIMEOUT_INFINITE ((int) 0x7fffffff)
+// 0x7fffffff (the largest 32-bit signed integer) or INT32_MAX
+const DBUS_METHOD_CALL_MAX_TIMEOUT: Duration = Duration::from_secs(i32::MAX as u64);
 const SERVICE_DISCOVERY_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// An error carrying out a Bluetooth operation.
@@ -350,7 +353,7 @@ impl BluetoothSession {
         adapter_id: &AdapterId,
         discovery_filter: &DiscoveryFilter,
     ) -> Result<(), BluetoothError> {
-        let adapter = self.adapter(&adapter_id);
+        let adapter = self.adapter(adapter_id);
         adapter.set_powered(true).await?;
         adapter
             .set_discovery_filter(discovery_filter.into())
@@ -378,7 +381,7 @@ impl BluetoothSession {
         &self,
         adapter_id: &AdapterId,
     ) -> Result<(), BluetoothError> {
-        let adapter = self.adapter(&adapter_id);
+        let adapter = self.adapter(adapter_id);
         adapter.stop_discovery().await?;
         Ok(())
     }
@@ -442,7 +445,10 @@ impl BluetoothSession {
         &self,
         device: &DeviceId,
     ) -> Result<Vec<ServiceInfo>, BluetoothError> {
-        let device_node = self.device(device).introspect_parse().await?;
+        let device_node = self
+            .device(device, DBUS_METHOD_CALL_TIMEOUT)
+            .introspect_parse()
+            .await?;
         let mut services = vec![];
         for subnode in device_node.nodes {
             let subnode_name = subnode.name.as_ref().unwrap();
@@ -567,21 +573,21 @@ impl BluetoothSession {
 
     /// Get information about the given Bluetooth device.
     pub async fn get_device_info(&self, id: &DeviceId) -> Result<DeviceInfo, BluetoothError> {
-        let device = self.device(&id);
+        let device = self.device(id, DBUS_METHOD_CALL_TIMEOUT);
         let properties = device.get_all(ORG_BLUEZ_DEVICE1_NAME).await?;
         DeviceInfo::from_properties(id.to_owned(), OrgBluezDevice1Properties(&properties))
     }
 
     /// Get information about the given Bluetooth adapter.
     pub async fn get_adapter_info(&self, id: &AdapterId) -> Result<AdapterInfo, BluetoothError> {
-        let adapter = self.adapter(&id);
+        let adapter = self.adapter(id);
         let properties = adapter.get_all(ORG_BLUEZ_ADAPTER1_NAME).await?;
         AdapterInfo::from_properties(id.to_owned(), OrgBluezAdapter1Properties(&properties))
     }
 
     /// Get information about the given GATT service.
     pub async fn get_service_info(&self, id: &ServiceId) -> Result<ServiceInfo, BluetoothError> {
-        let service = self.service(&id);
+        let service = self.service(id);
         let uuid = Uuid::parse_str(&service.uuid().await?)?;
         let primary = service.primary().await?;
         Ok(ServiceInfo {
@@ -596,7 +602,7 @@ impl BluetoothSession {
         &self,
         id: &CharacteristicId,
     ) -> Result<CharacteristicInfo, BluetoothError> {
-        let characteristic = self.characteristic(&id);
+        let characteristic = self.characteristic(id);
         let uuid = Uuid::parse_str(&characteristic.uuid().await?)?;
         let flags = characteristic.flags().await?;
         Ok(CharacteristicInfo {
@@ -611,7 +617,7 @@ impl BluetoothSession {
         &self,
         id: &DescriptorId,
     ) -> Result<DescriptorInfo, BluetoothError> {
-        let uuid = Uuid::parse_str(&self.descriptor(&id).uuid().await?)?;
+        let uuid = Uuid::parse_str(&self.descriptor(id).uuid().await?)?;
         Ok(DescriptorInfo {
             id: id.to_owned(),
             uuid,
@@ -627,11 +633,16 @@ impl BluetoothSession {
         )
     }
 
-    fn device(&self, id: &DeviceId) -> impl OrgBluezDevice1 + Introspectable + Properties {
+    fn device(
+        &self,
+        id: &DeviceId,
+        timeout: Duration,
+    ) -> impl OrgBluezDevice1 + Introspectable + Properties {
+        let timeout = timeout.min(DBUS_METHOD_CALL_MAX_TIMEOUT);
         Proxy::new(
             "org.bluez",
             id.object_path.to_owned(),
-            DBUS_METHOD_CALL_TIMEOUT,
+            timeout,
             self.connection.clone(),
         )
     }
@@ -673,7 +684,11 @@ impl BluetoothSession {
     async fn await_service_discovery(&self, device_id: &DeviceId) -> Result<(), BluetoothError> {
         // We need to subscribe to events before checking current value to avoid a race condition.
         let mut events = self.device_event_stream(device_id).await?;
-        if self.device(device_id).services_resolved().await? {
+        if self
+            .device(device_id, DBUS_METHOD_CALL_TIMEOUT)
+            .services_resolved()
+            .await?
+        {
             log::info!("Services already resolved.");
             return Ok(());
         }
@@ -697,13 +712,26 @@ impl BluetoothSession {
 
     /// Connect to the given Bluetooth device.
     pub async fn connect(&self, id: &DeviceId) -> Result<(), BluetoothError> {
-        self.device(id).connect().await?;
+        self.connect_with_timeout(id, DBUS_METHOD_CALL_TIMEOUT)
+            .await
+    }
+
+    /// Connect to the given Bluetooth device with specified timeout.
+    pub async fn connect_with_timeout(
+        &self,
+        id: &DeviceId,
+        timeout: Duration,
+    ) -> Result<(), BluetoothError> {
+        self.device(id, timeout).connect().await?;
         self.await_service_discovery(id).await
     }
 
     /// Disconnect from the given Bluetooth device.
     pub async fn disconnect(&self, id: &DeviceId) -> Result<(), BluetoothError> {
-        Ok(self.device(id).disconnect().await?)
+        Ok(self
+            .device(id, DBUS_METHOD_CALL_TIMEOUT)
+            .disconnect()
+            .await?)
     }
 
     /// Read the value of the given GATT characteristic.
