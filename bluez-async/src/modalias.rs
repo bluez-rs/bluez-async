@@ -47,12 +47,9 @@ impl TryFrom<RawModalias> for Modalias {
             return Err(());
         }
         Ok(Modalias {
-            vendor_id: u16::from_str_radix(raw.values.get("v").ok_or_else(|| ())?, 16)
-                .map_err(|_| ())?,
-            product_id: u16::from_str_radix(raw.values.get("p").ok_or_else(|| ())?, 16)
-                .map_err(|_| ())?,
-            device_id: u16::from_str_radix(raw.values.get("d").ok_or_else(|| ())?, 16)
-                .map_err(|_| ())?,
+            vendor_id: u16::from_str_radix(raw.values.get("v").ok_or(())?, 16).map_err(|_| ())?,
+            product_id: u16::from_str_radix(raw.values.get("p").ok_or(())?, 16).map_err(|_| ())?,
+            device_id: u16::from_str_radix(raw.values.get("d").ok_or(())?, 16).map_err(|_| ())?,
         })
     }
 }
