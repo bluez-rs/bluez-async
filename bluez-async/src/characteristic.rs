@@ -96,7 +96,7 @@ impl TryFrom<Vec<String>> for CharacteristicFlags {
                 "write" => Self::WRITE,
                 "notify" => Self::NOTIFY,
                 "indicate" => Self::INDICATE,
-                "authenticated-signed-write" => Self::SIGNED_WRITE,
+                "authenticated-signed-writes" => Self::SIGNED_WRITE,
                 "extended-properties" => Self::EXTENDED_PROPERTIES,
                 "reliable-write" => Self::RELIABLE_WRITE,
                 "writable-auxiliaries" => Self::WRITABLE_AUXILIARIES,
