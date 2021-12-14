@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Fixed bug with `authenticated-signed-writes` characteristic flag not being recognised due to typo.
+
 ## 0.5.0
 
 ### Breaking changes
