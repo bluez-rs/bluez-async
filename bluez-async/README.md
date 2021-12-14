@@ -8,8 +8,6 @@ It provides type-safe interfaces to a subset of the Bluetooth client (i.e. centr
 terminology) interfaces exposed by BlueZ, focussing on the Generic Attribute Profile (GATT) of
 Bluetooth Low Energy (BLE).
 
-This crate is incomplete, experimental, and may not be supported.
-
 ## Usage
 
 ```rust
