@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2
+
+### Bugfixes
+
+- Fixed `tokio` dependency to include `rt` feature.
+
 ## 0.5.1
 
 ### Bugfixes
