@@ -338,7 +338,7 @@ impl BluetoothSession {
             log::trace!("Starting discovery on adapter {}", adapter.id);
             self.start_discovery_on_adapter_with_filter(&adapter.id, discovery_filter)
                 .await
-                .unwrap_or_else(|err| println!("starting discovery failed {:?}", err));
+                .unwrap_or_else(|err| log::error!("starting discovery failed {:?}", err));
         }
         Ok(())
     }
