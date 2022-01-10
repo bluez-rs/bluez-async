@@ -845,6 +845,15 @@ impl BluetoothSession {
         self.filtered_event_stream(None::<&DeviceId>).await
     }
 
+    /// Get a stream of events for a particular adapter. This includes events for all devices it
+    /// discovers or connects to.
+    pub async fn adapter_event_stream(
+        &self,
+        adapter: &AdapterId,
+    ) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+        self.filtered_event_stream(Some(adapter)).await
+    }
+
     /// Get a stream of events for a particular device. This includes events for all its
     /// characteristics.
     pub async fn device_event_stream(
