@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use dbus::nonblock::stdintf::org_freedesktop_dbus::Introspectable;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 use super::BluetoothError;
 

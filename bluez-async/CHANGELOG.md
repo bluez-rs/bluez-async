@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+- Implemented `serde` `Serialize` and `Deserialize` traits for `AdapterId`, `DeviceId`, `ServiceId`,
+  `CharacteristicId` and `DescriptorId`.
+
 ## 0.5.4
 
 ### New features
