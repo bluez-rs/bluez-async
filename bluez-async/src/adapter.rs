@@ -19,6 +19,12 @@ impl AdapterId {
     }
 }
 
+impl From<AdapterId> for Path<'static> {
+    fn from(id: AdapterId) -> Self {
+        id.object_path
+    }
+}
+
 impl Display for AdapterId {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(

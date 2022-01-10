@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+- Added `BluetoothSession::adapter_event_stream` method.
+
 ## 0.5.3
 
 ### Bugfixes
