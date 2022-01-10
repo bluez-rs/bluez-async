@@ -91,9 +91,12 @@ impl BluetoothEvent {
     /// events, possibly limited to those for a particular object (such as a device, service or
     /// characteristic).
     ///
-    /// Note that the match rules for a device will not match the device discovered event for that
-    /// device, as it is considered an event for the system rather than the device itself.
-    pub(crate) fn match_rules(object: Option<impl Into<Path<'static>>>) -> Vec<MatchRule<'static>> {
+    /// Set `interfaces_added` to true to include ObjectManager InterfacesAdded signals, which map
+    /// to `DeviceEvent::Discovered` events.
+    pub(crate) fn match_rules(
+        object: Option<impl Into<Path<'static>>>,
+        interfaces_added: bool,
+    ) -> Vec<MatchRule<'static>> {
         // BusName validation just checks that the length and format is valid, so it should never
         // fail for a constant that we know is valid.
         let bus_name = "org.bluez".into();
@@ -102,7 +105,7 @@ impl BluetoothEvent {
 
         // If we aren't filtering to a single device or characteristic, then match ObjectManager
         // signals so we can get events for new devices being discovered.
-        if object.is_none() {
+        if interfaces_added {
             let match_rule =
                 ObjectManagerInterfacesAdded::match_rule(Some(&bus_name), None).static_clone();
             match_rules.push(match_rule);
@@ -367,7 +370,7 @@ mod tests {
 
     #[test]
     fn match_rules_all() {
-        let match_rules = BluetoothEvent::match_rules(None::<DeviceId>);
+        let match_rules = BluetoothEvent::match_rules(None::<DeviceId>, true);
 
         let message = new_device_message("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(match_rules.iter().any(|rule| rule.matches(&message)), true);
@@ -388,7 +391,7 @@ mod tests {
     #[test]
     fn match_rules_device() {
         let id = DeviceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66");
-        let match_rules = BluetoothEvent::match_rules(Some(id));
+        let match_rules = BluetoothEvent::match_rules(Some(id), false);
 
         let message = new_device_message("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(match_rules.iter().any(|rule| rule.matches(&message)), false);
@@ -409,7 +412,7 @@ mod tests {
     #[test]
     fn match_rules_service() {
         let id = ServiceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0012");
-        let match_rules = BluetoothEvent::match_rules(Some(id));
+        let match_rules = BluetoothEvent::match_rules(Some(id), false);
 
         let message = new_device_message("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(match_rules.iter().any(|rule| rule.matches(&message)), false);
@@ -431,7 +434,7 @@ mod tests {
     fn match_rules_characteristic() {
         let id =
             CharacteristicId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0012/char0034");
-        let match_rules = BluetoothEvent::match_rules(Some(id));
+        let match_rules = BluetoothEvent::match_rules(Some(id), false);
 
         let message = new_device_message("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(match_rules.iter().any(|rule| rule.matches(&message)), false);
