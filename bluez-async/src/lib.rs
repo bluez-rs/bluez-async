@@ -17,6 +17,7 @@ mod introspect;
 mod macaddress;
 mod messagestream;
 mod modalias;
+mod serde_path;
 mod service;
 
 pub use self::adapter::{AdapterId, AdapterInfo};

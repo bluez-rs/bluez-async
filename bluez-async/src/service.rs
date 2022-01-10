@@ -1,12 +1,14 @@
 use dbus::Path;
+use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
 use uuid::Uuid;
 
 use crate::DeviceId;
 
 /// Opaque identifier for a GATT service on a Bluetooth device.
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ServiceId {
+    #[serde(with = "crate::serde_path")]
     pub(crate) object_path: Path<'static>,
 }
 

@@ -1,6 +1,7 @@
 use bluez_generated::OrgBluezDevice1Properties;
 use dbus::arg::{cast, PropMap, RefArg, Variant};
 use dbus::Path;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
@@ -11,8 +12,9 @@ use crate::{AdapterId, BluetoothError, MacAddress};
 /// Opaque identifier for a Bluetooth device which the system knows about. This includes a reference
 /// to which Bluetooth adapter it was discovered on, which means that any attempt to connect to it
 /// will also happen from that adapter (in case the system has more than one).
-#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct DeviceId {
+    #[serde(with = "crate::serde_path")]
     pub(crate) object_path: Path<'static>,
 }
 
