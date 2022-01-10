@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Fixed `start_discovery` and `start_discovery_with_filter` to log errors rather than printing them
+  to stdout.
+
 ## 0.5.2
 
 ### Bugfixes
