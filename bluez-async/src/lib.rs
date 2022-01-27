@@ -196,6 +196,26 @@ impl From<&DiscoveryFilter> for PropMap {
     }
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ConnectProperties {
+    pub address: MacAddress,
+    pub address_type: Option<AddressType>,
+}
+
+impl From<&ConnectProperties> for PropMap {
+    fn from(properties: &ConnectProperties) -> Self {
+        let mut map: PropMap = HashMap::new();
+
+        map.insert("Address".to_string(), Variant(Box::new(properties.address.to_string())));
+
+        if let Some(address_type) = properties.address_type {
+            map.insert("AddressType".to_string(), Variant(Box::new(address_type.to_string())));
+        }
+
+        map
+    }
+}
+
 /// The type of write operation to use.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WriteType {
@@ -387,6 +407,13 @@ impl BluetoothSession {
     ) -> Result<(), BluetoothError> {
         let adapter = self.adapter(adapter_id);
         adapter.stop_discovery().await?;
+        Ok(())
+    }
+
+    /// Connect to a device with the provided properties on the specified adaptor
+    pub async fn connect_device_on_adapter(&self, adapter_id: &AdapterId, properties: &ConnectProperties) -> Result<(), BluetoothError> {
+        let adapter = self.adapter(adapter_id);
+        adapter.connect_device(properties.into()).await?;
         Ok(())
     }
 
