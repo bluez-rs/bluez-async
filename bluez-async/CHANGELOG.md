@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+### Breaking changes
+
+- Updated `uuid` dependency to 1.1.2.
+
 ## 0.5.5
 
 ### New features
