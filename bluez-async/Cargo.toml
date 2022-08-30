@@ -15,7 +15,7 @@ bitflags = "1.2.1"
 bluez-generated = { version = "0.2.1", path = "../bluez-generated" }
 dbus = { version = "0.9.6", features = ["futures"] }
 dbus-tokio = "0.7.5"
-futures = "0.3.23"
+futures = "0.3.24"
 itertools = "0.10.3"
 log = "0.4.17"
 serde = { version = "1.0.144", features = ["derive"] }
