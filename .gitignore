@@ -1,2 +1,18 @@
+# rust
 /target
+/debug
+.cargo-ok
+*.rs.bk
+
+# editor directories and files
+.vscode/**
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# misc
 .DS_Store
