@@ -24,6 +24,7 @@
     <property name="Alias" type="s" access="readwrite"/>
     <property name="Class" type="u" access="read"/>
     <property name="Powered" type="b" access="readwrite"/>
+    <property name="PowerState" type="s" access="read"/>
     <property name="Discoverable" type="b" access="readwrite"/>
     <property name="DiscoverableTimeout" type="u" access="readwrite"/>
     <property name="Pairable" type="b" access="readwrite"/>
@@ -31,6 +32,8 @@
     <property name="Discovering" type="b" access="read"/>
     <property name="UUIDs" type="as" access="read"/>
     <property name="Modalias" type="s" access="read"/>
+    <property name="Roles" type="as" access="read"/>
+    <property name="ExperimentalFeatures" type="as" access="read"/>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
@@ -73,6 +76,7 @@
     <property name="ActiveInstances" type="y" access="read"/>
     <property name="SupportedInstances" type="y" access="read"/>
     <property name="SupportedIncludes" type="as" access="read"/>
+    <property name="SupportedSecondaryChannels" type="as" access="read"/>
   </interface>
   <interface name="org.bluez.Media1">
     <method name="RegisterEndpoint">
@@ -89,6 +93,14 @@
     <method name="UnregisterPlayer">
       <arg name="player" type="o" direction="in"/>
     </method>
+    <method name="RegisterApplication">
+      <arg name="application" type="o" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+    </method>
+    <method name="UnregisterApplication">
+      <arg name="application" type="o" direction="in"/>
+    </method>
+    <property name="SupportedUUIDs" type="as" access="read"/>
   </interface>
   <interface name="org.bluez.NetworkServer1">
     <method name="Register">
