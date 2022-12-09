@@ -75,7 +75,4 @@
     <property name="Connected" type="b" access="read"/>
     <property name="Player" type="o" access="read"/>
   </interface>
-  <interface name="org.bluez.Battery1">
-    <property name="Percentage" type="y" access="read"/>
-  </interface>
 </node>
