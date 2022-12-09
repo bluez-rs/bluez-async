@@ -18,6 +18,8 @@ pub trait OrgBluezMedia1 {
     fn unregister_player(&self, player: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_MEDIA1_NAME: &str = "org.bluez.Media1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezMedia1
     for nonblock::Proxy<'a, C>
 {
@@ -49,5 +51,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezM
         self.method_call("org.bluez.Media1", "UnregisterPlayer", (player,))
     }
 }
-
-pub const ORG_BLUEZ_MEDIA1_NAME: &str = "org.bluez.Media1";

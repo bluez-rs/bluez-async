@@ -13,6 +13,8 @@ pub trait OrgBluezProfileManager1 {
     fn unregister_profile(&self, profile: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_PROFILE_MANAGER1_NAME: &str = "org.bluez.ProfileManager1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezProfileManager1
     for nonblock::Proxy<'a, C>
 {
@@ -33,5 +35,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezP
         self.method_call("org.bluez.ProfileManager1", "UnregisterProfile", (profile,))
     }
 }
-
-pub const ORG_BLUEZ_PROFILE_MANAGER1_NAME: &str = "org.bluez.ProfileManager1";

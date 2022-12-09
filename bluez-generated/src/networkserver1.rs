@@ -8,6 +8,8 @@ pub trait OrgBluezNetworkServer1 {
     fn unregister(&self, uuid: &str) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_NETWORK_SERVER1_NAME: &str = "org.bluez.NetworkServer1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezNetworkServer1
     for nonblock::Proxy<'a, C>
 {
@@ -19,5 +21,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezN
         self.method_call("org.bluez.NetworkServer1", "Unregister", (uuid,))
     }
 }
-
-pub const ORG_BLUEZ_NETWORK_SERVER1_NAME: &str = "org.bluez.NetworkServer1";
