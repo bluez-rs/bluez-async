@@ -11,6 +11,31 @@ pub trait OrgBluezGattDescriptor1 {
     fn value(&self) -> nonblock::MethodReply<Vec<u8>>;
 }
 
+pub const ORG_BLUEZ_GATT_DESCRIPTOR1_NAME: &str = "org.bluez.GattDescriptor1";
+
+#[derive(Copy, Clone, Debug)]
+pub struct OrgBluezGattDescriptor1Properties<'a>(pub &'a arg::PropMap);
+
+impl<'a> OrgBluezGattDescriptor1Properties<'a> {
+    pub fn from_interfaces(
+        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
+    ) -> Option<Self> {
+        interfaces.get("org.bluez.GattDescriptor1").map(Self)
+    }
+
+    pub fn uuid(&self) -> Option<&String> {
+        arg::prop_cast(self.0, "UUID")
+    }
+
+    pub fn characteristic(&self) -> Option<&dbus::Path<'static>> {
+        arg::prop_cast(self.0, "Characteristic")
+    }
+
+    pub fn value(&self) -> Option<&Vec<u8>> {
+        arg::prop_cast(self.0, "Value")
+    }
+}
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezGattDescriptor1
     for nonblock::Proxy<'a, C>
 {
@@ -45,30 +70,5 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezG
             "org.bluez.GattDescriptor1",
             "Value",
         )
-    }
-}
-
-pub const ORG_BLUEZ_GATT_DESCRIPTOR1_NAME: &str = "org.bluez.GattDescriptor1";
-
-#[derive(Copy, Clone, Debug)]
-pub struct OrgBluezGattDescriptor1Properties<'a>(pub &'a arg::PropMap);
-
-impl<'a> OrgBluezGattDescriptor1Properties<'a> {
-    pub fn from_interfaces(
-        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
-    ) -> Option<Self> {
-        interfaces.get("org.bluez.GattDescriptor1").map(Self)
-    }
-
-    pub fn uuid(&self) -> Option<&String> {
-        arg::prop_cast(self.0, "UUID")
-    }
-
-    pub fn characteristic(&self) -> Option<&dbus::Path<'static>> {
-        arg::prop_cast(self.0, "Characteristic")
-    }
-
-    pub fn value(&self) -> Option<&Vec<u8>> {
-        arg::prop_cast(self.0, "Value")
     }
 }

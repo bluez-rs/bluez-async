@@ -11,6 +11,8 @@ pub trait OrgBluezHealthManager1 {
     fn destroy_application(&self, application: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_HEALTH_MANAGER1_NAME: &str = "org.bluez.HealthManager1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezHealthManager1
     for nonblock::Proxy<'a, C>
 {
@@ -30,5 +32,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezH
         )
     }
 }
-
-pub const ORG_BLUEZ_HEALTH_MANAGER1_NAME: &str = "org.bluez.HealthManager1";

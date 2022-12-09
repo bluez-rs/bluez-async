@@ -12,6 +12,8 @@ pub trait OrgBluezGattManager1 {
     fn unregister_application(&self, application: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_GATT_MANAGER1_NAME: &str = "org.bluez.GattManager1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezGattManager1
     for nonblock::Proxy<'a, C>
 {
@@ -35,5 +37,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezG
         )
     }
 }
-
-pub const ORG_BLUEZ_GATT_MANAGER1_NAME: &str = "org.bluez.GattManager1";

@@ -15,6 +15,31 @@ pub trait OrgBluezLEAdvertisingManager1 {
     fn supported_includes(&self) -> nonblock::MethodReply<Vec<String>>;
 }
 
+pub const ORG_BLUEZ_LEADVERTISING_MANAGER1_NAME: &str = "org.bluez.LEAdvertisingManager1";
+
+#[derive(Copy, Clone, Debug)]
+pub struct OrgBluezLEAdvertisingManager1Properties<'a>(pub &'a arg::PropMap);
+
+impl<'a> OrgBluezLEAdvertisingManager1Properties<'a> {
+    pub fn from_interfaces(
+        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
+    ) -> Option<Self> {
+        interfaces.get("org.bluez.LEAdvertisingManager1").map(Self)
+    }
+
+    pub fn active_instances(&self) -> Option<u8> {
+        arg::prop_cast(self.0, "ActiveInstances").copied()
+    }
+
+    pub fn supported_instances(&self) -> Option<u8> {
+        arg::prop_cast(self.0, "SupportedInstances").copied()
+    }
+
+    pub fn supported_includes(&self) -> Option<&Vec<String>> {
+        arg::prop_cast(self.0, "SupportedIncludes")
+    }
+}
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezLEAdvertisingManager1
     for nonblock::Proxy<'a, C>
 {
@@ -60,30 +85,5 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezL
             "org.bluez.LEAdvertisingManager1",
             "SupportedIncludes",
         )
-    }
-}
-
-pub const ORG_BLUEZ_LEADVERTISING_MANAGER1_NAME: &str = "org.bluez.LEAdvertisingManager1";
-
-#[derive(Copy, Clone, Debug)]
-pub struct OrgBluezLEAdvertisingManager1Properties<'a>(pub &'a arg::PropMap);
-
-impl<'a> OrgBluezLEAdvertisingManager1Properties<'a> {
-    pub fn from_interfaces(
-        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
-    ) -> Option<Self> {
-        interfaces.get("org.bluez.LEAdvertisingManager1").map(Self)
-    }
-
-    pub fn active_instances(&self) -> Option<u8> {
-        arg::prop_cast(self.0, "ActiveInstances").copied()
-    }
-
-    pub fn supported_instances(&self) -> Option<u8> {
-        arg::prop_cast(self.0, "SupportedInstances").copied()
-    }
-
-    pub fn supported_includes(&self) -> Option<&Vec<String>> {
-        arg::prop_cast(self.0, "SupportedIncludes")
     }
 }

@@ -7,18 +7,6 @@ pub trait OrgBluezBattery1 {
     fn percentage(&self) -> nonblock::MethodReply<u8>;
 }
 
-impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezBattery1
-    for nonblock::Proxy<'a, C>
-{
-    fn percentage(&self) -> nonblock::MethodReply<u8> {
-        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
-            &self,
-            "org.bluez.Battery1",
-            "Percentage",
-        )
-    }
-}
-
 pub const ORG_BLUEZ_BATTERY1_NAME: &str = "org.bluez.Battery1";
 
 #[derive(Copy, Clone, Debug)]
@@ -33,5 +21,17 @@ impl<'a> OrgBluezBattery1Properties<'a> {
 
     pub fn percentage(&self) -> Option<u8> {
         arg::prop_cast(self.0, "Percentage").copied()
+    }
+}
+
+impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezBattery1
+    for nonblock::Proxy<'a, C>
+{
+    fn percentage(&self) -> nonblock::MethodReply<u8> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
+            &self,
+            "org.bluez.Battery1",
+            "Percentage",
+        )
     }
 }

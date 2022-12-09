@@ -9,6 +9,8 @@ pub trait OrgBluezAgentManager1 {
     fn request_default_agent(&self, agent: dbus::Path) -> nonblock::MethodReply<()>;
 }
 
+pub const ORG_BLUEZ_AGENT_MANAGER1_NAME: &str = "org.bluez.AgentManager1";
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezAgentManager1
     for nonblock::Proxy<'a, C>
 {
@@ -28,5 +30,3 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezA
         self.method_call("org.bluez.AgentManager1", "RequestDefaultAgent", (agent,))
     }
 }
-
-pub const ORG_BLUEZ_AGENT_MANAGER1_NAME: &str = "org.bluez.AgentManager1";

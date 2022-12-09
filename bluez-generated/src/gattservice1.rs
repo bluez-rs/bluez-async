@@ -10,6 +10,35 @@ pub trait OrgBluezGattService1 {
     fn includes(&self) -> nonblock::MethodReply<Vec<dbus::Path<'static>>>;
 }
 
+pub const ORG_BLUEZ_GATT_SERVICE1_NAME: &str = "org.bluez.GattService1";
+
+#[derive(Copy, Clone, Debug)]
+pub struct OrgBluezGattService1Properties<'a>(pub &'a arg::PropMap);
+
+impl<'a> OrgBluezGattService1Properties<'a> {
+    pub fn from_interfaces(
+        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
+    ) -> Option<Self> {
+        interfaces.get("org.bluez.GattService1").map(Self)
+    }
+
+    pub fn uuid(&self) -> Option<&String> {
+        arg::prop_cast(self.0, "UUID")
+    }
+
+    pub fn device(&self) -> Option<&dbus::Path<'static>> {
+        arg::prop_cast(self.0, "Device")
+    }
+
+    pub fn primary(&self) -> Option<bool> {
+        arg::prop_cast(self.0, "Primary").copied()
+    }
+
+    pub fn includes(&self) -> Option<&Vec<dbus::Path<'static>>> {
+        arg::prop_cast(self.0, "Includes")
+    }
+}
+
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezGattService1
     for nonblock::Proxy<'a, C>
 {
@@ -43,34 +72,5 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezG
             "org.bluez.GattService1",
             "Includes",
         )
-    }
-}
-
-pub const ORG_BLUEZ_GATT_SERVICE1_NAME: &str = "org.bluez.GattService1";
-
-#[derive(Copy, Clone, Debug)]
-pub struct OrgBluezGattService1Properties<'a>(pub &'a arg::PropMap);
-
-impl<'a> OrgBluezGattService1Properties<'a> {
-    pub fn from_interfaces(
-        interfaces: &'a ::std::collections::HashMap<String, arg::PropMap>,
-    ) -> Option<Self> {
-        interfaces.get("org.bluez.GattService1").map(Self)
-    }
-
-    pub fn uuid(&self) -> Option<&String> {
-        arg::prop_cast(self.0, "UUID")
-    }
-
-    pub fn device(&self) -> Option<&dbus::Path<'static>> {
-        arg::prop_cast(self.0, "Device")
-    }
-
-    pub fn primary(&self) -> Option<bool> {
-        arg::prop_cast(self.0, "Primary").copied()
-    }
-
-    pub fn includes(&self) -> Option<&Vec<dbus::Path<'static>>> {
-        arg::prop_cast(self.0, "Includes")
     }
 }
