@@ -55,6 +55,7 @@ impl Display for DeviceId {
 }
 
 /// Information about a Bluetooth device which was discovered.
+/// See https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/device-api.txt
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DeviceInfo {
     /// An opaque identifier for the device, including a reference to which adapter it was
@@ -65,6 +66,7 @@ pub struct DeviceInfo {
     /// The type of MAC address the device uses.
     pub address_type: AddressType,
     /// The human-readable name of the device, if available.
+    /// Use the Alias property instead.
     pub name: Option<String>,
     /// The appearance of the device, as defined by GAP.
     pub appearance: Option<u16>,
@@ -88,6 +90,29 @@ pub struct DeviceInfo {
     pub service_data: HashMap<Uuid, Vec<u8>>,
     /// Whether service discovery has finished for the device.
     pub services_resolved: bool,
+    /// The Bluetooth friendly name. This defaults to the system hostname.
+    pub alias: Option<String>,
+    /// The Bluetooth class of device, automatically configured by DMI/ACPI information
+    /// or provided as static configuration.
+    pub class: Option<u32>,
+    // Indicates if the information exchanged on pairing process has been stored
+    // and will be persisted.
+    pub bonded: bool,
+    // Proposed icon name according to the freedesktop.org icon naming specification.
+    pub icon: Option<String>,
+    // Indicates if the remote is seen as trusted.
+    pub trusted: bool,
+    // If set to true any incoming connections from the device will be immediately rejected.
+    // Any device drivers will also be removed.
+    pub blocked: bool,
+    // Set to true if the device only supports the pre-2.1 Bluetooth pairing mechanism.
+    // This property is useful during device discovery to anticipate whether legacy or
+    // simple pairing will occur if pairing is initiated.
+    pub legacy_pairing: bool,
+    // Remote Device ID information in modalias format used by the kernel and udev.
+    pub modalias: Option<String>,
+    // If set to true this device will be allowed to wake the host from system suspend.
+    pub wake_allowed: bool,
 }
 
 impl DeviceInfo {
@@ -127,6 +152,25 @@ impl DeviceInfo {
             services_resolved: device_properties
                 .services_resolved()
                 .ok_or(BluetoothError::RequiredPropertyMissing("ServicesResolved"))?,
+            alias: device_properties.alias().cloned(),
+            class: device_properties.class(),
+            bonded: device_properties
+                .bonded()
+                .ok_or(BluetoothError::RequiredPropertyMissing("Bonded"))?,
+            icon: device_properties.icon().cloned(),
+            trusted: device_properties
+                .trusted()
+                .ok_or(BluetoothError::RequiredPropertyMissing("Trusted"))?,
+            blocked: device_properties
+                .blocked()
+                .ok_or(BluetoothError::RequiredPropertyMissing("Blocked"))?,
+            legacy_pairing: device_properties
+                .legacy_pairing()
+                .ok_or(BluetoothError::RequiredPropertyMissing("LegacyPairing"))?,
+            modalias: device_properties.modalias().cloned(),
+            wake_allowed: device_properties
+                .wake_allowed()
+                .ok_or(BluetoothError::RequiredPropertyMissing("WakeAllowed"))?,
         })
     }
 }
@@ -308,6 +352,11 @@ mod tests {
         device_properties.insert("Paired".to_string(), Variant(Box::new(false)));
         device_properties.insert("Connected".to_string(), Variant(Box::new(false)));
         device_properties.insert("ServicesResolved".to_string(), Variant(Box::new(false)));
+        device_properties.insert("Bonded".to_string(), Variant(Box::new(false)));
+        device_properties.insert("Trusted".to_string(), Variant(Box::new(false)));
+        device_properties.insert("Blocked".to_string(), Variant(Box::new(false)));
+        device_properties.insert("LegacyPairing".to_string(), Variant(Box::new(false)));
+        device_properties.insert("WakeAllowed".to_string(), Variant(Box::new(false)));
 
         let device =
             DeviceInfo::from_properties(id.clone(), OrgBluezDevice1Properties(&device_properties))
@@ -328,6 +377,15 @@ mod tests {
                 manufacturer_data: HashMap::new(),
                 service_data: HashMap::new(),
                 services_resolved: false,
+                alias: None,
+                class: None,
+                bonded: false,
+                icon: None,
+                trusted: false,
+                blocked: false,
+                legacy_pairing: false,
+                modalias: None,
+                wake_allowed: false,
             }
         )
     }
