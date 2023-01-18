@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+### Breaking changes
+
+- Added more fields to `DeviceInfo`.
+
 ## 0.6.0
 
 ### Breaking changes
