@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Default `DeviceInfo.wake_allowed` to false if it is not set rather than returning an error. It
+  appears not to be set in some cases, possibly depending on controller hardware, which was
+  resulting in no devices being discovered.
+
 ## 0.7.0
 
 ### Breaking changes

@@ -168,9 +168,7 @@ impl DeviceInfo {
                 .legacy_pairing()
                 .ok_or(BluetoothError::RequiredPropertyMissing("LegacyPairing"))?,
             modalias: device_properties.modalias().cloned(),
-            wake_allowed: device_properties
-                .wake_allowed()
-                .ok_or(BluetoothError::RequiredPropertyMissing("WakeAllowed"))?,
+            wake_allowed: device_properties.wake_allowed().unwrap_or(false),
         })
     }
 }
@@ -356,7 +354,6 @@ mod tests {
         device_properties.insert("Trusted".to_string(), Variant(Box::new(false)));
         device_properties.insert("Blocked".to_string(), Variant(Box::new(false)));
         device_properties.insert("LegacyPairing".to_string(), Variant(Box::new(false)));
-        device_properties.insert("WakeAllowed".to_string(), Variant(Box::new(false)));
 
         let device =
             DeviceInfo::from_properties(id.clone(), OrgBluezDevice1Properties(&device_properties))
