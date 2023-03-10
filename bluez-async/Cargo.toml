@@ -14,7 +14,7 @@ async-trait = "0.1.66"
 bitflags = "1.2.1"
 bluez-generated = { version = "0.3.0", path = "../bluez-generated" }
 dbus = { version = "0.9.7", features = ["futures"] }
-dbus-tokio = "0.7.5"
+dbus-tokio = "0.7.6"
 futures = "0.3.26"
 itertools = "0.10.5"
 log = "0.4.17"
