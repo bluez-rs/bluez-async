@@ -66,6 +66,7 @@ pub struct CharacteristicInfo {
 bitflags! {
     /// The set of flags (a.k.a. properties) of a characteristic, defining how the characteristic
     /// can be used.
+    #[derive(Copy, Clone, Debug, Eq, PartialEq)]
     pub struct CharacteristicFlags: u16 {
         const BROADCAST = 0x01;
         const READ = 0x02;
