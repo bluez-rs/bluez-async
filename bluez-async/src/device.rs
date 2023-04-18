@@ -154,9 +154,7 @@ impl DeviceInfo {
                 .ok_or(BluetoothError::RequiredPropertyMissing("ServicesResolved"))?,
             alias: device_properties.alias().cloned(),
             class: device_properties.class(),
-            bonded: device_properties
-                .bonded()
-                .ok_or(BluetoothError::RequiredPropertyMissing("Bonded"))?,
+            bonded: device_properties.bonded().unwrap_or_default(),
             icon: device_properties.icon().cloned(),
             trusted: device_properties
                 .trusted()
