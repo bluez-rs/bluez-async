@@ -47,7 +47,7 @@ checksum = "c70beb79cbb5ce9c4f8e20849978f34225931f665bb49efa6982875a4d5facb3"
 
 [[package]]
 name = "bluez-async"
-version = "0.7.1"
+version = "0.7.2"
 dependencies = [
  "async-trait",
  "bitflags",
