@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Default `DeviceInfo.bonded` to false if it is not set rather than returning an error. It was only
+  added in BlueZ 5.65 so earlier versions will omit it, which resulted in devices being dropped
+  entirely.
+
 ## 0.7.1
 
 ### Bugfixes
