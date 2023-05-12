@@ -61,6 +61,11 @@ pub struct CharacteristicInfo {
     /// The set of flags (a.k.a. properties) of the characteristic, defining how the characteristic
     /// can be used.
     pub flags: CharacteristicFlags,
+    /// Characteristic MTU.
+    ///
+    /// This is valid both for ReadValue and WriteValue, but either method can use long procedures
+    /// when supported.
+    pub mtu: Option<u16>,
 }
 
 bitflags! {
