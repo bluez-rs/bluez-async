@@ -34,6 +34,7 @@
     <property name="Flags" type="as" access="read"/>
     <property name="WriteAcquired" type="b" access="read"/>
     <property name="NotifyAcquired" type="b" access="read"/>
+    <property name="MTU" type="q" access="read"/>
   </interface>
   <interface name="org.freedesktop.DBus.Properties">
     <method name="Get">
