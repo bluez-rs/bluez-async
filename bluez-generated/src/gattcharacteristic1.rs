@@ -17,6 +17,7 @@ pub trait OrgBluezGattCharacteristic1 {
     fn flags(&self) -> nonblock::MethodReply<Vec<String>>;
     fn write_acquired(&self) -> nonblock::MethodReply<bool>;
     fn notify_acquired(&self) -> nonblock::MethodReply<bool>;
+    fn mtu(&self) -> nonblock::MethodReply<u16>;
 }
 
 pub const ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME: &str = "org.bluez.GattCharacteristic1";
@@ -57,6 +58,10 @@ impl<'a> OrgBluezGattCharacteristic1Properties<'a> {
 
     pub fn notify_acquired(&self) -> Option<bool> {
         arg::prop_cast(self.0, "NotifyAcquired").copied()
+    }
+
+    pub fn mtu(&self) -> Option<u16> {
+        arg::prop_cast(self.0, "MTU").copied()
     }
 }
 
@@ -145,6 +150,14 @@ impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezG
             &self,
             "org.bluez.GattCharacteristic1",
             "NotifyAcquired",
+        )
+    }
+
+    fn mtu(&self) -> nonblock::MethodReply<u16> {
+        <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
+            &self,
+            "org.bluez.GattCharacteristic1",
+            "MTU",
         )
     }
 }
