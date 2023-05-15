@@ -1,7 +1,8 @@
 use bitflags::bitflags;
+use bluez_generated::OrgBluezGattCharacteristic1Properties;
 use dbus::Path;
 use serde::{Deserialize, Serialize};
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 use std::fmt::{self, Display, Formatter};
 use uuid::Uuid;
 
@@ -68,6 +69,30 @@ pub struct CharacteristicInfo {
     pub mtu: Option<u16>,
 }
 
+impl CharacteristicInfo {
+    pub(crate) fn from_properties(
+        id: CharacteristicId,
+        characteristic_properties: OrgBluezGattCharacteristic1Properties,
+    ) -> Result<Self, BluetoothError> {
+        let uuid = Uuid::parse_str(
+            characteristic_properties
+                .uuid()
+                .ok_or(BluetoothError::RequiredPropertyMissing("UUID"))?,
+        )?;
+        let flags = characteristic_properties
+            .flags()
+            .ok_or(BluetoothError::RequiredPropertyMissing("Flags"))?
+            .as_slice()
+            .try_into()?;
+        Ok(Self {
+            id,
+            uuid,
+            flags,
+            mtu: characteristic_properties.mtu(),
+        })
+    }
+}
+
 bitflags! {
     /// The set of flags (a.k.a. properties) of a characteristic, defining how the characteristic
     /// can be used.
@@ -91,10 +116,10 @@ bitflags! {
     }
 }
 
-impl TryFrom<Vec<String>> for CharacteristicFlags {
+impl TryFrom<&[String]> for CharacteristicFlags {
     type Error = BluetoothError;
 
-    fn try_from(value: Vec<String>) -> Result<Self, BluetoothError> {
+    fn try_from(value: &[String]) -> Result<Self, BluetoothError> {
         let mut flags = Self::empty();
         for flag_string in value {
             let flag = match flag_string.as_ref() {
@@ -113,11 +138,19 @@ impl TryFrom<Vec<String>> for CharacteristicFlags {
                 "encrypt-authenticated-read" => Self::ENCRYPT_AUTHENTICATED_READ,
                 "encrypt-authenticated-write" => Self::ENCRYPT_AUTHENTICATED_WRITE,
                 "authorize" => Self::AUTHORIZE,
-                _ => return Err(BluetoothError::FlagParseError(flag_string)),
+                _ => return Err(BluetoothError::FlagParseError(flag_string.to_owned())),
             };
             flags.insert(flag);
         }
         Ok(flags)
+    }
+}
+
+impl TryFrom<Vec<String>> for CharacteristicFlags {
+    type Error = BluetoothError;
+
+    fn try_from(value: Vec<String>) -> Result<Self, BluetoothError> {
+        value.as_slice().try_into()
     }
 }
 

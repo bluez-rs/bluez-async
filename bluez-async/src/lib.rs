@@ -33,8 +33,9 @@ pub use self::modalias::{Modalias, ParseModaliasError};
 pub use self::service::{ServiceId, ServiceInfo};
 use bluez_generated::{
     OrgBluezAdapter1, OrgBluezAdapter1Properties, OrgBluezDevice1, OrgBluezDevice1Properties,
-    OrgBluezGattCharacteristic1, OrgBluezGattDescriptor1, OrgBluezGattService1,
-    ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME,
+    OrgBluezGattCharacteristic1, OrgBluezGattCharacteristic1Properties, OrgBluezGattDescriptor1,
+    OrgBluezGattService1, ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME,
+    ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME,
 };
 use dbus::arg::{PropMap, Variant};
 use dbus::nonblock::stdintf::org_freedesktop_dbus::{Introspectable, ObjectManager, Properties};
@@ -44,7 +45,6 @@ use dbus_tokio::connection::IOResourceError;
 use futures::stream::{self, select_all, StreamExt};
 use futures::{FutureExt, Stream};
 use std::collections::HashMap;
-use std::convert::TryInto;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::future::Future;
 use std::sync::Arc;
@@ -490,16 +490,7 @@ impl BluetoothSession {
                 let characteristic_id = CharacteristicId {
                     object_path: format!("{}/{}", service.object_path, subnode_name).into(),
                 };
-                let characteristic = self.characteristic(&characteristic_id);
-                let uuid = Uuid::parse_str(&characteristic.uuid().await?)?;
-                let flags = characteristic.flags().await?;
-                let mtu = characteristic.mtu().await.ok();
-                characteristics.push(CharacteristicInfo {
-                    id: characteristic_id,
-                    uuid,
-                    flags: flags.try_into()?,
-                    mtu,
-                });
+                characteristics.push(self.get_characteristic_info(&characteristic_id).await?);
             }
         }
         Ok(characteristics)
@@ -609,15 +600,13 @@ impl BluetoothSession {
         id: &CharacteristicId,
     ) -> Result<CharacteristicInfo, BluetoothError> {
         let characteristic = self.characteristic(id);
-        let uuid = Uuid::parse_str(&characteristic.uuid().await?)?;
-        let flags = characteristic.flags().await?;
-        let mtu = characteristic.mtu().await.ok();
-        Ok(CharacteristicInfo {
-            id: id.to_owned(),
-            uuid,
-            flags: flags.try_into()?,
-            mtu,
-        })
+        let properties = characteristic
+            .get_all(ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME)
+            .await?;
+        CharacteristicInfo::from_properties(
+            id.to_owned(),
+            OrgBluezGattCharacteristic1Properties(&properties),
+        )
     }
 
     /// Get information about the given GATT descriptor.
