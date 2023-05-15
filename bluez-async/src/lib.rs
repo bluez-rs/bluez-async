@@ -493,10 +493,12 @@ impl BluetoothSession {
                 let characteristic = self.characteristic(&characteristic_id);
                 let uuid = Uuid::parse_str(&characteristic.uuid().await?)?;
                 let flags = characteristic.flags().await?;
+                let mtu = characteristic.mtu().await.ok();
                 characteristics.push(CharacteristicInfo {
                     id: characteristic_id,
                     uuid,
                     flags: flags.try_into()?,
+                    mtu,
                 });
             }
         }
@@ -609,10 +611,12 @@ impl BluetoothSession {
         let characteristic = self.characteristic(id);
         let uuid = Uuid::parse_str(&characteristic.uuid().await?)?;
         let flags = characteristic.flags().await?;
+        let mtu = characteristic.mtu().await.ok();
         Ok(CharacteristicInfo {
             id: id.to_owned(),
             uuid,
             flags: flags.try_into()?,
+            mtu,
         })
     }
 
