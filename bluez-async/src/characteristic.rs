@@ -157,8 +157,8 @@ impl TryFrom<Vec<String>> for CharacteristicFlags {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    use std::convert::TryInto;
+    use dbus::arg::{PropMap, Variant};
+    use std::{collections::HashMap, convert::TryInto};
 
     #[test]
     fn characteristic_service() {
@@ -195,6 +195,34 @@ mod tests {
         assert_eq!(
             characteristic_id.to_string(),
             "hci0/dev_11_22_33_44_55_66/service0022/char0033"
+        );
+    }
+
+    #[test]
+    fn characteristic_info_minimal() {
+        let id =
+            CharacteristicId::new("/org/bluez/hci0/dev_11_22_33_44_55_66/service0022/char0033");
+        let mut characteristic_properties: PropMap = HashMap::new();
+        characteristic_properties.insert(
+            "UUID".to_string(),
+            Variant(Box::new("ebe0ccb9-7a0a-4b0c-8a1a-6ff2997da3a6".to_string())),
+        );
+        characteristic_properties
+            .insert("Flags".to_string(), Variant(Box::new(Vec::<String>::new())));
+
+        let characteristic = CharacteristicInfo::from_properties(
+            id.clone(),
+            OrgBluezGattCharacteristic1Properties(&characteristic_properties),
+        )
+        .unwrap();
+        assert_eq!(
+            characteristic,
+            CharacteristicInfo {
+                id,
+                uuid: Uuid::from_u128(0xebe0ccb9_7a0a_4b0c_8a1a_6ff2997da3a6),
+                flags: CharacteristicFlags::empty(),
+                mtu: None
+            }
         );
     }
 }
