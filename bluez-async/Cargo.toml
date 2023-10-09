@@ -21,10 +21,10 @@ log = "0.4.20"
 serde = { version = "1.0.188", features = ["derive"] }
 serde-xml-rs = "0.6.0"
 thiserror = "1.0.49"
-tokio = { version = "1.32.0", features = ["rt"] }
+tokio = { version = "1.33.0", features = ["rt"] }
 uuid = "1.4.1"
 
 [dev-dependencies]
 eyre = "0.6.8"
 pretty_env_logger = "0.5.0"
-tokio = { version = "1.32.0", features = ["macros", "rt", "rt-multi-thread", "time"] }
+tokio = { version = "1.33.0", features = ["macros", "rt", "rt-multi-thread", "time"] }
