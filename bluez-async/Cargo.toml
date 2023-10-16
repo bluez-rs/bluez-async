@@ -10,7 +10,7 @@ keywords = ["ble", "bluetooth", "bluez"]
 categories = ["api-bindings", "hardware-support", "os::linux-apis"]
 
 [dependencies]
-async-trait = "0.1.73"
+async-trait = "0.1.74"
 bitflags = "2.4.0"
 bluez-generated = { version = "0.3.0", path = "../bluez-generated" }
 dbus = { version = "0.9.7", features = ["futures"] }
