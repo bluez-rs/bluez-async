@@ -16,7 +16,7 @@ bluez-generated = { version = "0.3.0", path = "../bluez-generated" }
 dbus = { version = "0.9.7", features = ["futures"] }
 dbus-tokio = "0.7.6"
 futures = "0.3.30"
-itertools = "0.12.1"
+itertools = "0.13.0"
 log = "0.4.21"
 serde = { version = "1.0.202", features = ["derive"] }
 serde-xml-rs = "0.6.0"
