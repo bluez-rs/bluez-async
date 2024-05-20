@@ -20,7 +20,7 @@ itertools = "0.13.0"
 log = "0.4.21"
 serde = { version = "1.0.202", features = ["derive"] }
 serde-xml-rs = "0.6.0"
-thiserror = "1.0.60"
+thiserror = "1.0.61"
 tokio = { version = "1.37.0", features = ["rt"] }
 uuid = "1.8.0"
 
