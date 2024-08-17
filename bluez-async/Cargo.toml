@@ -18,7 +18,7 @@ dbus-tokio = "0.7.6"
 futures = "0.3.30"
 itertools = "0.13.0"
 log = "0.4.22"
-serde = { version = "1.0.207", features = ["derive"] }
+serde = { version = "1.0.208", features = ["derive"] }
 serde-xml-rs = "0.6.0"
 thiserror = "1.0.63"
 tokio = { version = "1.38.1", features = ["rt"] }
