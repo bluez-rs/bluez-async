@@ -196,26 +196,6 @@ impl From<&DiscoveryFilter> for PropMap {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct ConnectProperties {
-    pub address: MacAddress,
-    pub address_type: Option<AddressType>,
-}
-
-impl From<&ConnectProperties> for PropMap {
-    fn from(properties: &ConnectProperties) -> Self {
-        let mut map: PropMap = HashMap::new();
-
-        map.insert("Address".to_string(), Variant(Box::new(properties.address.to_string())));
-
-        if let Some(address_type) = properties.address_type {
-            map.insert("AddressType".to_string(), Variant(Box::new(address_type.to_string())));
-        }
-
-        map
-    }
-}
-
 /// The type of write operation to use.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum WriteType {
@@ -407,13 +387,6 @@ impl BluetoothSession {
     ) -> Result<(), BluetoothError> {
         let adapter = self.adapter(adapter_id);
         adapter.stop_discovery().await?;
-        Ok(())
-    }
-
-    /// Connect to a device with the provided properties on the specified adaptor
-    pub async fn connect_device_on_adapter(&self, adapter_id: &AdapterId, properties: &ConnectProperties) -> Result<(), BluetoothError> {
-        let adapter = self.adapter(adapter_id);
-        adapter.connect_device(properties.into()).await?;
         Ok(())
     }
 
@@ -748,6 +721,33 @@ impl BluetoothSession {
     ) -> Result<(), BluetoothError> {
         self.device(id, timeout).connect().await?;
         self.await_service_discovery(id).await
+    }
+
+    /// Connect to a device with the given address on the specified adapter.
+    ///
+    /// The BlueZ documentation says that this method is experimental.
+    pub async fn connect_device(
+        &self,
+        adapter_id: &AdapterId,
+        address: MacAddress,
+        address_type: Option<AddressType>,
+    ) -> Result<DeviceId, BluetoothError> {
+        let mut properties: PropMap = HashMap::new();
+        properties.insert(
+            "Address".to_string(),
+            Variant(Box::new(address.to_string())),
+        );
+        if let Some(address_type) = address_type {
+            properties.insert(
+                "AddressType".to_string(),
+                Variant(Box::new(address_type.to_string())),
+            );
+        }
+
+        let adapter = self.adapter(adapter_id);
+        let id = adapter.connect_device(properties).await?;
+        self.await_service_discovery(id).await?;
+        Ok(id)
     }
 
     /// Disconnect from the given Bluetooth device.
