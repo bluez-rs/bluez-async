@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+
+### Breaking changes
+
+- Added `mtu` to `CharacteristicInfo`.
+
+### New features
+
+- Implemented `TryFrom<&[String]>` for `CharacteristicFlags`.
+
 ## 0.7.2
 
 ### Bugfixes
