@@ -707,13 +707,31 @@ impl BluetoothSession {
         .unwrap_or(Err(BluetoothError::ServiceDiscoveryTimedOut))
     }
 
+    /// Connect to the given Bluetooth device and initiate pairing, with the specified timeout.
+    pub async fn pair_with_timeout(
+        &self,
+        id: &DeviceId,
+        timeout: Duration,
+    ) -> Result<(), BluetoothError> {
+        self.device(id, timeout).pair().await?;
+        self.await_service_discovery(id).await
+    }
+
+    /// Cancel a pairing operation with the given Bluetooth device.
+    pub async fn cancel_pairing(&self, id: &DeviceId) -> Result<(), BluetoothError> {
+        Ok(self
+            .device(id, DBUS_METHOD_CALL_TIMEOUT)
+            .cancel_pairing()
+            .await?)
+    }
+
     /// Connect to the given Bluetooth device.
     pub async fn connect(&self, id: &DeviceId) -> Result<(), BluetoothError> {
         self.connect_with_timeout(id, DBUS_METHOD_CALL_TIMEOUT)
             .await
     }
 
-    /// Connect to the given Bluetooth device with specified timeout.
+    /// Connect to the given Bluetooth device with the specified timeout.
     pub async fn connect_with_timeout(
         &self,
         id: &DeviceId,

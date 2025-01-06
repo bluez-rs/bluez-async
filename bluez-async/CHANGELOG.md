@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+- Added `pair_with_timeout` and `cancel_pairing` to `BluetoothSession`.
+
 ## 0.8.0
 
 ### Breaking changes
