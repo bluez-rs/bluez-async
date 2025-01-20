@@ -391,7 +391,7 @@ mod tests {
 
         assert_eq!(
             get_services(OrgBluezDevice1Properties(&device_properties)),
-            vec![]
+            Vec::<Uuid>::new(),
         )
     }
 
