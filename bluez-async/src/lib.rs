@@ -21,7 +21,7 @@ mod serde_path;
 mod service;
 
 pub use self::adapter::{AdapterId, AdapterInfo};
-pub use self::bleuuid::{uuid_from_u16, uuid_from_u32, BleUuid};
+pub use self::bleuuid::{BleUuid, uuid_from_u16, uuid_from_u32};
 pub use self::characteristic::{CharacteristicFlags, CharacteristicId, CharacteristicInfo};
 pub use self::descriptor::{DescriptorId, DescriptorInfo};
 pub use self::device::{AddressType, DeviceId, DeviceInfo};
@@ -32,17 +32,17 @@ use self::messagestream::MessageStream;
 pub use self::modalias::{Modalias, ParseModaliasError};
 pub use self::service::{ServiceId, ServiceInfo};
 use bluez_generated::{
+    ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME, ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME,
     OrgBluezAdapter1, OrgBluezAdapter1Properties, OrgBluezDevice1, OrgBluezDevice1Properties,
     OrgBluezGattCharacteristic1, OrgBluezGattCharacteristic1Properties, OrgBluezGattDescriptor1,
-    OrgBluezGattService1, ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME,
-    ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME,
+    OrgBluezGattService1,
 };
+use dbus::Path;
 use dbus::arg::{PropMap, Variant};
 use dbus::nonblock::stdintf::org_freedesktop_dbus::{Introspectable, ObjectManager, Properties};
 use dbus::nonblock::{Proxy, SyncConnection};
-use dbus::Path;
 use dbus_tokio::connection::IOResourceError;
-use futures::stream::{self, select_all, StreamExt};
+use futures::stream::{self, StreamExt, select_all};
 use futures::{FutureExt, Stream};
 use std::collections::HashMap;
 use std::fmt::{self, Debug, Display, Formatter};
@@ -280,8 +280,8 @@ impl BluetoothSession {
     /// Returns a tuple of (join handle, Self).
     /// If the join handle ever completes then you're in trouble and should
     /// probably restart the process.
-    pub async fn new(
-    ) -> Result<(impl Future<Output = Result<(), SpawnError>>, Self), BluetoothError> {
+    pub async fn new()
+    -> Result<(impl Future<Output = Result<(), SpawnError>>, Self), BluetoothError> {
         // Connect to the D-Bus system bus (this is blocking, unfortunately).
         let (dbus_resource, connection) = dbus_tokio::connection::new_system_sync()?;
         // Configure the connection to send signal messages to all matching `MsgMatch`es, as we may
@@ -621,7 +621,10 @@ impl BluetoothSession {
         })
     }
 
-    fn adapter(&self, id: &AdapterId) -> impl OrgBluezAdapter1 + Introspectable + Properties {
+    fn adapter(
+        &self,
+        id: &AdapterId,
+    ) -> impl OrgBluezAdapter1 + Introspectable + Properties + use<> {
         Proxy::new(
             "org.bluez",
             id.object_path.to_owned(),
@@ -634,7 +637,7 @@ impl BluetoothSession {
         &self,
         id: &DeviceId,
         timeout: Duration,
-    ) -> impl OrgBluezDevice1 + Introspectable + Properties {
+    ) -> impl OrgBluezDevice1 + Introspectable + Properties + use<> {
         let timeout = timeout.min(DBUS_METHOD_CALL_MAX_TIMEOUT);
         Proxy::new(
             "org.bluez",
@@ -644,7 +647,10 @@ impl BluetoothSession {
         )
     }
 
-    fn service(&self, id: &ServiceId) -> impl OrgBluezGattService1 + Introspectable + Properties {
+    fn service(
+        &self,
+        id: &ServiceId,
+    ) -> impl OrgBluezGattService1 + Introspectable + Properties + use<> {
         Proxy::new(
             "org.bluez",
             id.object_path.to_owned(),
@@ -656,7 +662,7 @@ impl BluetoothSession {
     fn characteristic(
         &self,
         id: &CharacteristicId,
-    ) -> impl OrgBluezGattCharacteristic1 + Introspectable + Properties {
+    ) -> impl OrgBluezGattCharacteristic1 + Introspectable + Properties + use<> {
         Proxy::new(
             "org.bluez",
             id.object_path.to_owned(),
@@ -668,7 +674,7 @@ impl BluetoothSession {
     fn descriptor(
         &self,
         id: &DescriptorId,
-    ) -> impl OrgBluezGattDescriptor1 + Introspectable + Properties {
+    ) -> impl OrgBluezGattDescriptor1 + Introspectable + Properties + use<> {
         Proxy::new(
             "org.bluez",
             id.object_path.to_owned(),
@@ -853,7 +859,9 @@ impl BluetoothSession {
     }
 
     /// Get a stream of events for all devices.
-    pub async fn event_stream(&self) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+    pub async fn event_stream(
+        &self,
+    ) -> Result<impl Stream<Item = BluetoothEvent> + use<>, BluetoothError> {
         self.filtered_event_stream(None::<&DeviceId>, true).await
     }
 
@@ -862,7 +870,7 @@ impl BluetoothSession {
     pub async fn adapter_event_stream(
         &self,
         adapter: &AdapterId,
-    ) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+    ) -> Result<impl Stream<Item = BluetoothEvent> + use<>, BluetoothError> {
         self.filtered_event_stream(Some(adapter), true).await
     }
 
@@ -874,7 +882,7 @@ impl BluetoothSession {
     pub async fn device_event_stream(
         &self,
         device: &DeviceId,
-    ) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+    ) -> Result<impl Stream<Item = BluetoothEvent> + use<>, BluetoothError> {
         self.filtered_event_stream(Some(device), false).await
     }
 
@@ -882,16 +890,16 @@ impl BluetoothSession {
     pub async fn characteristic_event_stream(
         &self,
         characteristic: &CharacteristicId,
-    ) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+    ) -> Result<impl Stream<Item = BluetoothEvent> + use<>, BluetoothError> {
         self.filtered_event_stream(Some(characteristic), false)
             .await
     }
 
-    async fn filtered_event_stream(
+    async fn filtered_event_stream<P: Into<Path<'static>> + Clone>(
         &self,
-        object: Option<&(impl Into<Path<'static>> + Clone)>,
+        object: Option<&P>,
         device_discovery: bool,
-    ) -> Result<impl Stream<Item = BluetoothEvent>, BluetoothError> {
+    ) -> Result<impl Stream<Item = BluetoothEvent> + use<P>, BluetoothError> {
         let mut message_streams = vec![];
         for match_rule in BluetoothEvent::match_rules(object.cloned(), device_discovery) {
             let msg_match = self.connection.add_match(match_rule).await?;

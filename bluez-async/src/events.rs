@@ -1,6 +1,6 @@
 use bluez_generated::{
-    OrgBluezAdapter1Properties, OrgBluezDevice1Properties, OrgBluezGattCharacteristic1Properties,
     ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME, ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME,
+    OrgBluezAdapter1Properties, OrgBluezDevice1Properties, OrgBluezGattCharacteristic1Properties,
 };
 use dbus::message::{MatchRule, SignalArgs};
 use dbus::nonblock::stdintf::org_freedesktop_dbus::{

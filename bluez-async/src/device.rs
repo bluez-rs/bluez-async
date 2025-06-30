@@ -1,6 +1,6 @@
 use bluez_generated::OrgBluezDevice1Properties;
-use dbus::arg::{cast, PropMap, RefArg, Variant};
 use dbus::Path;
+use dbus::arg::{PropMap, RefArg, Variant, cast};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::{self, Display, Formatter};

@@ -1,7 +1,7 @@
-use dbus::nonblock::{MsgMatch, SyncConnection};
 use dbus::Message;
-use futures::channel::mpsc::UnboundedReceiver;
+use dbus::nonblock::{MsgMatch, SyncConnection};
 use futures::Stream;
+use futures::channel::mpsc::UnboundedReceiver;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
