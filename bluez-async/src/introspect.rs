@@ -5,6 +5,7 @@ use super::BluetoothError;
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Node {
+    #[serde(rename = "@name")]
     pub name: Option<String>,
     #[serde(rename = "interface", default)]
     pub interfaces: Vec<Interface>,
@@ -14,6 +15,7 @@ pub struct Node {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Interface {
+    #[serde(rename = "@name")]
     pub name: String,
     #[serde(rename = "method", default)]
     pub methods: Vec<Method>,
@@ -27,6 +29,7 @@ pub struct Interface {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Method {
+    #[serde(rename = "@name")]
     pub name: String,
     #[serde(rename = "arg", default)]
     pub args: Vec<MethodArg>,
@@ -36,6 +39,7 @@ pub struct Method {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Signal {
+    #[serde(rename = "@name")]
     pub name: String,
     #[serde(rename = "arg", default)]
     pub args: Vec<SignalArg>,
@@ -45,9 +49,11 @@ pub struct Signal {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Property {
+    #[serde(rename = "@name")]
     pub name: String,
-    #[serde(rename = "type")]
+    #[serde(rename = "@type")]
     pub dbustype: String,
+    #[serde(rename = "@access")]
     pub access: Access,
     #[serde(rename = "annotation", default)]
     pub annotations: Vec<Annotation>,
@@ -55,10 +61,11 @@ pub struct Property {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct MethodArg {
+    #[serde(rename = "@name")]
     pub name: Option<String>,
-    #[serde(rename = "type")]
+    #[serde(rename = "@type")]
     pub dbustype: String,
-    #[serde(default = "default_method_arg_direction")]
+    #[serde(rename = "@direction", default = "default_method_arg_direction")]
     pub direction: Direction,
     #[serde(rename = "annotation", default)]
     pub annotations: Vec<Annotation>,
@@ -66,10 +73,11 @@ pub struct MethodArg {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct SignalArg {
+    #[serde(rename = "@name")]
     pub name: Option<String>,
-    #[serde(rename = "type")]
+    #[serde(rename = "@type")]
     pub dbustype: String,
-    #[serde(default = "default_signal_arg_direction")]
+    #[serde(rename = "@direction", default = "default_signal_arg_direction")]
     pub direction: Direction,
     #[serde(rename = "annotation", default)]
     pub annotations: Vec<Annotation>,
@@ -85,7 +93,9 @@ fn default_signal_arg_direction() -> Direction {
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Annotation {
+    #[serde(rename = "@name")]
     pub name: String,
+    #[serde(rename = "@value")]
     pub value: String,
 }
 
