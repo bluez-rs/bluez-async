@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+- Added `set_powered` to `BluetoothSession`.
+
 ## 0.8.1
 
 ### New features
