@@ -296,6 +296,16 @@ impl BluetoothSession {
         Ok((dbus_handle.map(|res| res?), BluetoothSession { connection }))
     }
 
+    /// Powers the given adapter on or off.
+    pub async fn set_powered(
+        &self,
+        adapter_id: &AdapterId,
+        powered: bool,
+    ) -> Result<(), BluetoothError> {
+        self.adapter(adapter_id).set_powered(powered).await?;
+        Ok(())
+    }
+
     /// Power on all Bluetooth adapters, remove any discovery filter, and then start scanning for
     /// devices.
     ///
