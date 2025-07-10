@@ -1,6 +1,6 @@
 [package]
 name = "bluez-async"
-version = "0.8.1"
+version = "0.8.2"
 authors = [
   "Andrew Walbran <qwandor@google.com>",
   "David Laban <alsuren@gmail.com>",
