@@ -16,4 +16,4 @@ categories = ["api-bindings", "os::linux-apis"]
 maintenance = { status = "experimental" }
 
 [dependencies]
-dbus = { version = "0.9.7", features = ["futures"] }
+dbus = { version = "0.9.9", features = ["futures"] }
