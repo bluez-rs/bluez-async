@@ -3,6 +3,7 @@ use dbus::Path;
 use dbus::arg::{PropMap, RefArg, Variant, cast};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -38,6 +39,16 @@ impl DeviceId {
 impl From<DeviceId> for Path<'static> {
     fn from(id: DeviceId) -> Self {
         id.object_path
+    }
+}
+
+impl TryFrom<&str> for DeviceId {
+    type Error = dbus::Error;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let path = Path::try_from(format!("/org/bluez/{}", s))
+            .map_err(|_| dbus::Error::new_failed("Invalid D-Bus path"))?;
+        Ok(DeviceId { object_path: path.into_static() })
     }
 }
 
@@ -294,6 +305,12 @@ mod tests {
     fn to_string() {
         let device_id = DeviceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(device_id.to_string(), "hci0/dev_11_22_33_44_55_66");
+    }
+
+    #[test]
+    fn from_string() {
+        let device_id = DeviceId::try_from("hci0/dev_11_22_33_44_55_66");
+        assert_eq!(device_id.unwrap().to_string(), "hci0/dev_11_22_33_44_55_66");
     }
 
     #[test]
