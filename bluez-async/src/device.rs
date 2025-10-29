@@ -3,6 +3,7 @@ use dbus::Path;
 use dbus::arg::{PropMap, RefArg, Variant, cast};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 use uuid::Uuid;
@@ -38,6 +39,23 @@ impl DeviceId {
 impl From<DeviceId> for Path<'static> {
     fn from(id: DeviceId) -> Self {
         id.object_path
+    }
+}
+
+impl FromStr for DeviceId {
+    type Err = BluetoothError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.starts_with("hci") {
+            return Err(BluetoothError::DeviceIdParseError(s.to_string()));
+        }
+
+        let path = Path::new(format!("/org/bluez/{}", s))
+            .map_err(|_| BluetoothError::DeviceIdParseError(s.to_string()))?;
+
+        Ok(DeviceId {
+            object_path: path.into_static(),
+        })
     }
 }
 
@@ -294,6 +312,18 @@ mod tests {
     fn to_string() {
         let device_id = DeviceId::new("/org/bluez/hci0/dev_11_22_33_44_55_66");
         assert_eq!(device_id.to_string(), "hci0/dev_11_22_33_44_55_66");
+    }
+
+    #[test]
+    fn from_string() {
+        let device_id = DeviceId::from_str("hci0/dev_11_22_33_44_55_66");
+        assert_eq!(device_id.unwrap().to_string(), "hci0/dev_11_22_33_44_55_66");
+
+        let invalid_id = DeviceId::from_str("dev_11_22_33_44_55_66");
+        assert_eq!(
+            invalid_id.unwrap_err().to_string(),
+            "Error parsing DeviceId string: dev_11_22_33_44_55_66"
+        );
     }
 
     #[test]
