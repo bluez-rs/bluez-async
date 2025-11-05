@@ -96,6 +96,9 @@ pub enum BluetoothError {
     /// Error parsing a `Modalias` from a string.
     #[error(transparent)]
     ModaliasParseError(#[from] ParseModaliasError),
+    /// Error parsing DeviceId from a string.
+    #[error("Error parsing DeviceId string: {0}")]
+    DeviceIdParseError(String),
 }
 
 /// Error type for futures representing tasks spawned by this crate.
