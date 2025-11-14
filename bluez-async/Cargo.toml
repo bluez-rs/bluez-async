@@ -21,7 +21,7 @@ futures = "0.3.31"
 itertools = "0.14.0"
 log = "0.4.28"
 serde = { version = "1.0.228", features = ["derive"] }
-serde-xml-rs = "0.8.1"
+serde-xml-rs = "0.8.2"
 thiserror = "2.0.17"
 tokio = { version = "1.48.0", features = ["rt"] }
 uuid = "1.16.0"
