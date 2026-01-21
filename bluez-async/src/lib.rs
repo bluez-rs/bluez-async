@@ -58,7 +58,7 @@ const DBUS_METHOD_CALL_TIMEOUT: Duration = Duration::from_secs(30);
 // in dbus C lib the max value is #define DBUS_TIMEOUT_INFINITE ((int) 0x7fffffff)
 // 0x7fffffff (the largest 32-bit signed integer) or INT32_MAX
 const DBUS_METHOD_CALL_MAX_TIMEOUT: Duration = Duration::from_secs(i32::MAX as u64);
-const SERVICE_DISCOVERY_TIMEOUT: Duration = Duration::from_secs(5);
+const SERVICE_DISCOVERY_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// An error carrying out a Bluetooth operation.
 #[derive(Debug, Error)]
