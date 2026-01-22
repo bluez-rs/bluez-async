@@ -760,6 +760,33 @@ impl BluetoothSession {
         self.await_service_discovery(id).await
     }
 
+    /// Connect to a device with the given address on the specified adapter.
+    ///
+    /// The BlueZ documentation says that this method is experimental.
+    pub async fn connect_device(
+        &self,
+        adapter_id: &AdapterId,
+        address: MacAddress,
+        address_type: Option<AddressType>,
+    ) -> Result<DeviceId, BluetoothError> {
+        let mut properties: PropMap = HashMap::new();
+        properties.insert(
+            "Address".to_string(),
+            Variant(Box::new(address.to_string())),
+        );
+        if let Some(address_type) = address_type {
+            properties.insert(
+                "AddressType".to_string(),
+                Variant(Box::new(address_type.to_string())),
+            );
+        }
+
+        let adapter = self.adapter(adapter_id);
+        let id = adapter.connect_device(properties).await?;
+        self.await_service_discovery(id).await?;
+        Ok(id)
+    }
+
     /// Disconnect from the given Bluetooth device.
     pub async fn disconnect(&self, id: &DeviceId) -> Result<(), BluetoothError> {
         Ok(self
