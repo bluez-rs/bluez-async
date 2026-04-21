@@ -24,7 +24,7 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde-xml-rs = "0.8.2"
 thiserror = "2.0.18"
 tokio = { version = "1.52.0", features = ["rt"] }
-uuid = "1.16.0"
+uuid = "1.23.1"
 
 [dev-dependencies]
 eyre = "0.6.12"
