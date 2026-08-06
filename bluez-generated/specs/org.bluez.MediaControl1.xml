@@ -72,6 +72,33 @@
     <property name="UUID" type="s" access="read"/>
   </interface>
   <interface name="org.bluez.MediaControl1">
+    <method name="Play">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="Pause">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="Stop">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="Next">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="Previous">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="VolumeUp">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="VolumeDown">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="FastForward">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
+    <method name="Rewind">
+      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
+    </method>
     <property name="Connected" type="b" access="read"/>
     <property name="Player" type="o" access="read"/>
   </interface>
