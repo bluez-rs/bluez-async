@@ -10,7 +10,7 @@ use thiserror::Error;
 pub struct ParseModaliasError(String);
 
 /// The subtype of a modalias string.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ModaliasSubtype {
     Usb,
     Bluetooth,
@@ -20,7 +20,7 @@ pub enum ModaliasSubtype {
 ///
 /// The `usb` and `bluetooth` subtypes are accepted and retained alongside the
 /// numeric vendor, product, and device fields.
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Modalias {
     pub subtype: ModaliasSubtype,
     pub vendor_id: u16,
