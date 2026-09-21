@@ -16,6 +16,27 @@ pub enum ModaliasSubtype {
     Bluetooth,
 }
 
+impl Display for ModaliasSubtype {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.write_str(match self {
+            Self::Usb => "usb",
+            Self::Bluetooth => "bluetooth",
+        })
+    }
+}
+
+impl FromStr for ModaliasSubtype {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "usb" => Ok(Self::Usb),
+            "bluetooth" => Ok(Self::Bluetooth),
+            _ => Err(()),
+        }
+    }
+}
+
 /// A parsed modalias string.
 ///
 /// The `usb` and `bluetooth` subtypes are accepted and retained alongside the
@@ -30,14 +51,10 @@ pub struct Modalias {
 
 impl Display for Modalias {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        let subtype = match self.subtype {
-            ModaliasSubtype::Usb => "usb",
-            ModaliasSubtype::Bluetooth => "bluetooth",
-        };
         write!(
             f,
-            "{subtype}:v{:04X}p{:04X}d{:04X}",
-            self.vendor_id, self.product_id, self.device_id
+            "{}:v{:04X}p{:04X}d{:04X}",
+            self.subtype, self.vendor_id, self.product_id, self.device_id
         )
     }
 }
@@ -56,13 +73,8 @@ impl TryFrom<RawModalias> for Modalias {
     type Error = ();
 
     fn try_from(raw: RawModalias) -> Result<Self, Self::Error> {
-        let subtype = match raw.subtype.as_str() {
-            "usb" => ModaliasSubtype::Usb,
-            "bluetooth" => ModaliasSubtype::Bluetooth,
-            _ => return Err(()),
-        };
         Ok(Modalias {
-            subtype,
+            subtype: raw.subtype.as_str().parse()?,
             vendor_id: u16::from_str_radix(raw.values.get("v").ok_or(())?, 16).map_err(|_| ())?,
             product_id: u16::from_str_radix(raw.values.get("p").ok_or(())?, 16).map_err(|_| ())?,
             device_id: u16::from_str_radix(raw.values.get("d").ok_or(())?, 16).map_err(|_| ())?,
