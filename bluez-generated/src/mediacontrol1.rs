@@ -4,6 +4,24 @@ use dbus::arg;
 use dbus::nonblock;
 
 pub trait OrgBluezMediaControl1 {
+    #[deprecated(note = "true")]
+    fn play(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn pause(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn stop(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn next(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn previous(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn volume_up(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn volume_down(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn fast_forward(&self) -> nonblock::MethodReply<()>;
+    #[deprecated(note = "true")]
+    fn rewind(&self) -> nonblock::MethodReply<()>;
     fn connected(&self) -> nonblock::MethodReply<bool>;
     fn player(&self) -> nonblock::MethodReply<dbus::Path<'static>>;
 }
@@ -32,6 +50,51 @@ impl<'a> OrgBluezMediaControl1Properties<'a> {
 impl<'a, T: nonblock::NonblockReply, C: ::std::ops::Deref<Target = T>> OrgBluezMediaControl1
     for nonblock::Proxy<'a, C>
 {
+    #[deprecated(note = "true")]
+    fn play(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Play", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn pause(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Pause", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn stop(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Stop", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn next(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Next", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn previous(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Previous", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn volume_up(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "VolumeUp", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn volume_down(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "VolumeDown", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn fast_forward(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "FastForward", ())
+    }
+
+    #[deprecated(note = "true")]
+    fn rewind(&self) -> nonblock::MethodReply<()> {
+        self.method_call("org.bluez.MediaControl1", "Rewind", ())
+    }
+
     fn connected(&self) -> nonblock::MethodReply<bool> {
         <Self as nonblock::stdintf::org_freedesktop_dbus::Properties>::get(
             &self,
