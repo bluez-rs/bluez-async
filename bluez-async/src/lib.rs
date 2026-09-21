@@ -29,7 +29,7 @@ pub use self::events::{AdapterEvent, BluetoothEvent, CharacteristicEvent, Device
 use self::introspect::IntrospectParse;
 pub use self::macaddress::{MacAddress, ParseMacAddressError};
 use self::messagestream::MessageStream;
-pub use self::modalias::{Modalias, ParseModaliasError};
+pub use self::modalias::{Modalias, ModaliasSubtype, ParseModaliasError};
 pub use self::service::{ServiceId, ServiceInfo};
 use bluez_generated::{
     ORG_BLUEZ_ADAPTER1_NAME, ORG_BLUEZ_DEVICE1_NAME, ORG_BLUEZ_GATT_CHARACTERISTIC1_NAME,

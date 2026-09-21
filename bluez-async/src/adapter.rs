@@ -108,6 +108,7 @@ mod tests {
     use std::collections::HashMap;
 
     use super::*;
+    use crate::modalias::ModaliasSubtype;
 
     #[test]
     fn adapter_info_minimal() {
@@ -144,6 +145,7 @@ mod tests {
                 name: "name".to_string(),
                 alias: "alias".to_string(),
                 modalias: Modalias {
+                    subtype: ModaliasSubtype::Usb,
                     vendor_id: 0x1234,
                     product_id: 0x5678,
                     device_id: 0x90ab

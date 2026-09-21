@@ -9,13 +9,20 @@ use thiserror::Error;
 #[error("Error parsing modalias string {0:?}")]
 pub struct ParseModaliasError(String);
 
+/// The subtype of a modalias string.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ModaliasSubtype {
+    Usb,
+    Bluetooth,
+}
+
 /// A parsed modalias string.
 ///
-/// The `usb` and `bluetooth` subtypes are accepted. Only the numeric vendor,
-/// product, and device fields are retained; the original subtype is not
-/// preserved, and [`Display`] uses the existing USB-style representation.
+/// The `usb` and `bluetooth` subtypes are accepted and retained alongside the
+/// numeric vendor, product, and device fields.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Modalias {
+    pub subtype: ModaliasSubtype,
     pub vendor_id: u16,
     pub product_id: u16,
     pub device_id: u16,
@@ -23,9 +30,13 @@ pub struct Modalias {
 
 impl Display for Modalias {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let subtype = match self.subtype {
+            ModaliasSubtype::Usb => "usb",
+            ModaliasSubtype::Bluetooth => "bluetooth",
+        };
         write!(
             f,
-            "usb:v{:04X}p{:04X}d{:04X}",
+            "{subtype}:v{:04X}p{:04X}d{:04X}",
             self.vendor_id, self.product_id, self.device_id
         )
     }
@@ -45,10 +56,13 @@ impl TryFrom<RawModalias> for Modalias {
     type Error = ();
 
     fn try_from(raw: RawModalias) -> Result<Self, Self::Error> {
-        if raw.subtype != "usb" && raw.subtype != "bluetooth" {
-            return Err(());
-        }
+        let subtype = match raw.subtype.as_str() {
+            "usb" => ModaliasSubtype::Usb,
+            "bluetooth" => ModaliasSubtype::Bluetooth,
+            _ => return Err(()),
+        };
         Ok(Modalias {
+            subtype,
             vendor_id: u16::from_str_radix(raw.values.get("v").ok_or(())?, 16).map_err(|_| ())?,
             product_id: u16::from_str_radix(raw.values.get("p").ok_or(())?, 16).map_err(|_| ())?,
             device_id: u16::from_str_radix(raw.values.get("d").ok_or(())?, 16).map_err(|_| ())?,
@@ -109,6 +123,7 @@ mod tests {
         assert_eq!(
             Modalias::from_str("usb:v0000p0000d0000").unwrap(),
             Modalias {
+                subtype: ModaliasSubtype::Usb,
                 vendor_id: 0,
                 product_id: 0,
                 device_id: 0
@@ -117,6 +132,7 @@ mod tests {
         assert_eq!(
             Modalias::from_str("usb:v1234p5678d90AB").unwrap(),
             Modalias {
+                subtype: ModaliasSubtype::Usb,
                 vendor_id: 0x1234,
                 product_id: 0x5678,
                 device_id: 0x90AB
@@ -129,11 +145,18 @@ mod tests {
         assert_eq!(
             Modalias::from_str("bluetooth:vABCDp0123d4567").unwrap(),
             Modalias {
+                subtype: ModaliasSubtype::Bluetooth,
                 vendor_id: 0xABCD,
                 product_id: 0x0123,
                 device_id: 0x4567,
             }
         );
+    }
+
+    #[test]
+    fn bluetooth_modalias_round_trips() {
+        let modalias = Modalias::from_str("bluetooth:vABCDp0123d4567").unwrap();
+        assert_eq!(modalias.to_string(), "bluetooth:vABCDp0123d4567");
     }
 
     #[test]
@@ -160,6 +183,7 @@ mod tests {
     fn to_string() {
         assert_eq!(
             Modalias {
+                subtype: ModaliasSubtype::Usb,
                 vendor_id: 0,
                 product_id: 0,
                 device_id: 0
@@ -169,6 +193,7 @@ mod tests {
         );
         assert_eq!(
             Modalias {
+                subtype: ModaliasSubtype::Usb,
                 vendor_id: 0x1234,
                 product_id: 0x5678,
                 device_id: 0x90AB
