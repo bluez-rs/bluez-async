@@ -1,10 +1,9 @@
+use crate::Modalias;
+use crate::{AddressType, BluetoothError, MacAddress};
 use bluez_generated::OrgBluezAdapter1Properties;
 use dbus::Path;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
-
-use crate::Modalias;
-use crate::{AddressType, BluetoothError, MacAddress};
 
 /// Opaque identifier for a Bluetooth adapter on the system.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
@@ -104,11 +103,10 @@ impl AdapterInfo {
 
 #[cfg(test)]
 mod tests {
-    use dbus::arg::{PropMap, Variant};
-    use std::collections::HashMap;
-
     use super::*;
     use crate::modalias::ModaliasSubtype;
+    use dbus::arg::{PropMap, Variant};
+    use std::collections::HashMap;
 
     #[test]
     fn adapter_info_minimal() {
