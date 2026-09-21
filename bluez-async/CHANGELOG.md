@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Breaking changes
+
+- Added `subtype` field to `Modalias` to support `bluetooth` modaliases as well as `usb`.
+
 ## 0.8.2
 
 ### New features
