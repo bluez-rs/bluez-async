@@ -11,7 +11,9 @@ pub struct ParseModaliasError(String);
 
 /// A parsed modalias string.
 ///
-/// For now only the USB subtype is supported.
+/// The `usb` and `bluetooth` subtypes are accepted. Only the numeric vendor,
+/// product, and device fields are retained; the original subtype is not
+/// preserved, and [`Display`] uses the existing USB-style representation.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Modalias {
     pub vendor_id: u16,
@@ -43,7 +45,7 @@ impl TryFrom<RawModalias> for Modalias {
     type Error = ();
 
     fn try_from(raw: RawModalias) -> Result<Self, Self::Error> {
-        if raw.subtype != "usb" {
+        if raw.subtype != "usb" && raw.subtype != "bluetooth" {
             return Err(());
         }
         Ok(Modalias {
@@ -118,6 +120,18 @@ mod tests {
                 vendor_id: 0x1234,
                 product_id: 0x5678,
                 device_id: 0x90AB
+            }
+        );
+    }
+
+    #[test]
+    fn parse_bluetooth_modalias() {
+        assert_eq!(
+            Modalias::from_str("bluetooth:vABCDp0123d4567").unwrap(),
+            Modalias {
+                vendor_id: 0xABCD,
+                product_id: 0x0123,
+                device_id: 0x4567,
             }
         );
     }
