@@ -42,11 +42,14 @@ use dbus::arg::{PropMap, Variant};
 use dbus::nonblock::stdintf::org_freedesktop_dbus::{Introspectable, ObjectManager, Properties};
 use dbus::nonblock::{Proxy, SyncConnection};
 use dbus_tokio::connection::IOResourceError;
+use futures::channel::oneshot;
+use futures::future::{self, Either};
 use futures::stream::{self, StreamExt, select_all};
 use futures::{FutureExt, Stream};
 use std::collections::HashMap;
 use std::fmt::{self, Debug, Display, Formatter};
 use std::future::Future;
+use std::pin::pin;
 use std::sync::Arc;
 use std::time::Duration;
 use thiserror::Error;
@@ -269,6 +272,14 @@ impl From<WriteOptions> for PropMap {
 #[derive(Clone)]
 pub struct BluetoothSession {
     connection: Arc<SyncConnection>,
+    io_task: Arc<IoTaskGuard>,
+}
+
+/// Stops the task driving the D-Bus connection when dropped. Every `BluetoothSession` clone and
+/// every `MessageStream` behind an event stream holds one reference, so the connection closes once
+/// the last of them is gone.
+pub(crate) struct IoTaskGuard {
+    _close: oneshot::Sender<()>,
 }
 
 impl Debug for BluetoothSession {
@@ -281,8 +292,11 @@ impl BluetoothSession {
     /// Establish a new D-Bus connection to communicate with BlueZ.
     ///
     /// Returns a tuple of (join handle, Self).
-    /// If the join handle ever completes then you're in trouble and should
-    /// probably restart the process.
+    ///
+    /// The connection stays open until this session, all its clones and every event stream
+    /// obtained from them have been dropped. The join handle then completes with `Ok(())`. If it
+    /// completes with an error first, the connection to D-Bus was lost and you should probably
+    /// restart the process.
     pub async fn new()
     -> Result<(impl Future<Output = Result<(), SpawnError>>, Self), BluetoothError> {
         // Connect to the D-Bus system bus (this is blocking, unfortunately).
@@ -292,11 +306,29 @@ impl BluetoothSession {
         connection.set_signal_match_mode(true);
         // The resource is a task that should be spawned onto a tokio compatible
         // reactor ASAP. If the resource ever finishes, you lost connection to D-Bus.
-        let dbus_handle = tokio::spawn(async {
-            let err = dbus_resource.await;
-            Err(SpawnError::DbusConnectionLost(err))
+        let (close, closed) = oneshot::channel();
+        let task_connection = connection.clone();
+        let dbus_handle = tokio::spawn(async move {
+            // `IOResource` drops its connection before its reactor registration. Hold another
+            // reference, dropped after the resource, so the socket stays open until it has been
+            // deregistered.
+            let _connection = task_connection;
+            let resource = pin!(dbus_resource);
+            match future::select(resource, closed).await {
+                Either::Left((err, _)) => Err(SpawnError::DbusConnectionLost(err)),
+                // Every session and stream was dropped. Returning drops the resource, which
+                // closes the connection.
+                Either::Right(_) => Ok(()),
+            }
         });
-        Ok((dbus_handle.map(|res| res?), BluetoothSession { connection }))
+        let io_task = Arc::new(IoTaskGuard { _close: close });
+        Ok((
+            dbus_handle.map(|res| res?),
+            BluetoothSession {
+                connection,
+                io_task,
+            },
+        ))
     }
 
     /// Powers the given adapter on or off.
@@ -921,6 +953,7 @@ impl BluetoothSession {
                 msg_match,
                 match_str,
                 self.connection.clone(),
+                self.io_task.clone(),
             ));
         }
         Ok(select_all(message_streams)

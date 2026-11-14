@@ -1,3 +1,4 @@
+use crate::IoTaskGuard;
 use dbus::Message;
 use dbus::channel::MatchingReceiver;
 use dbus::nonblock::{MsgMatch, SyncConnection};
@@ -17,16 +18,23 @@ pub struct MessageStream {
     match_str: String,
     events: UnboundedReceiver<Message>,
     connection: Arc<SyncConnection>,
+    io_task: Arc<IoTaskGuard>,
 }
 
 impl MessageStream {
-    pub fn new(msg_match: MsgMatch, match_str: String, connection: Arc<SyncConnection>) -> Self {
+    pub fn new(
+        msg_match: MsgMatch,
+        match_str: String,
+        connection: Arc<SyncConnection>,
+        io_task: Arc<IoTaskGuard>,
+    ) -> Self {
         let (msg_match, events) = msg_match.msg_stream();
         Self {
             msg_match,
             match_str,
             events,
             connection,
+            io_task,
         }
     }
 }
@@ -53,6 +61,8 @@ impl Drop for MessageStream {
             return;
         };
         let connection = self.connection.clone();
+        // Keeps the connection open until the daemon-side rule has been removed.
+        let io_task = self.io_task.clone();
         let match_str = std::mem::take(&mut self.match_str);
         runtime.spawn(async move {
             // This can fail, for example once the D-Bus connection has been lost. Panicking here
@@ -63,6 +73,7 @@ impl Drop for MessageStream {
                     e
                 );
             }
+            drop(io_task);
         });
     }
 }
