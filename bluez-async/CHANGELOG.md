@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Bugfixes
+
+- Dropping an event stream no longer panics when its D-Bus match can't be removed. A signal
+  arriving while the stream was being dropped made the removal fail and left the match registered
+  with the D-Bus daemon; the stream now removes its local filter before that can happen and the
+  daemon-side rule separately. Other failures, such as a lost D-Bus connection or no Tokio runtime
+  running, are logged instead. In applications built with `panic = "abort"` the panic aborted the
+  process.
+
 ## 0.9.0
 
 ### Breaking changes
