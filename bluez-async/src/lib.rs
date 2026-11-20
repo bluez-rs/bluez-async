@@ -915,8 +915,13 @@ impl BluetoothSession {
     ) -> Result<impl Stream<Item = BluetoothEvent> + use<P>, BluetoothError> {
         let mut message_streams = vec![];
         for match_rule in BluetoothEvent::match_rules(object.cloned(), device_discovery) {
+            let match_str = match_rule.match_str();
             let msg_match = self.connection.add_match(match_rule).await?;
-            message_streams.push(MessageStream::new(msg_match, self.connection.clone()));
+            message_streams.push(MessageStream::new(
+                msg_match,
+                match_str,
+                self.connection.clone(),
+            ));
         }
         Ok(select_all(message_streams)
             .flat_map(|message| stream::iter(BluetoothEvent::message_to_events(message))))
