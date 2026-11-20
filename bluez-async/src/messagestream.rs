@@ -3,6 +3,7 @@ use dbus::channel::MatchingReceiver;
 use dbus::nonblock::{MsgMatch, SyncConnection};
 use futures::Stream;
 use futures::channel::mpsc::UnboundedReceiver;
+use log::warn;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
@@ -45,7 +46,10 @@ impl Drop for MessageStream {
         // `remove_match` would fail before it reached the daemon (#419).
         self.connection.stop_receive(msg_match.token());
         let Ok(runtime) = tokio::runtime::Handle::try_current() else {
-            log::debug!("No Tokio runtime to remove the D-Bus match for a dropped stream");
+            warn!(
+                "No Tokio runtime to remove the D-Bus match {} token for a dropped stream",
+                self.match_str,
+            );
             return;
         };
         let connection = self.connection.clone();
@@ -54,8 +58,8 @@ impl Drop for MessageStream {
             // This can fail, for example once the D-Bus connection has been lost. Panicking here
             // would abort applications built with `panic = "abort"`, so log the error instead.
             if let Err(e) = connection.remove_match_no_cb(&match_str).await {
-                log::debug!(
-                    "Failed to remove the D-Bus match for a dropped stream: {}",
+                warn!(
+                    "Failed to remove the D-Bus match {match_str} for a dropped stream: {}",
                     e
                 );
             }
