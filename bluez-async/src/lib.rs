@@ -278,7 +278,7 @@ pub struct BluetoothSession {
 /// Stops the task driving the D-Bus connection when dropped. Every `BluetoothSession` clone and
 /// every `MessageStream` behind an event stream holds one reference, so the connection closes once
 /// the last of them is gone.
-pub(crate) struct IoTaskGuard {
+struct IoTaskGuard {
     _close: oneshot::Sender<()>,
 }
 
