@@ -7,11 +7,12 @@ use log::warn;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
+use tokio::runtime::Handle;
 
 /// Wrapper for a stream of D-Bus messages which automatically removes the `MsgMatch` from the D-Bus
 /// connection when it is dropped.
 pub struct MessageStream {
-    msg_match: Option<MsgMatch>,
+    msg_match: MsgMatch,
     /// The match rule, to remove it from the D-Bus daemon when the stream is dropped.
     match_str: String,
     events: UnboundedReceiver<Message>,
@@ -22,7 +23,7 @@ impl MessageStream {
     pub fn new(msg_match: MsgMatch, match_str: String, connection: Arc<SyncConnection>) -> Self {
         let (msg_match, events) = msg_match.msg_stream();
         Self {
-            msg_match: Some(msg_match),
+            msg_match,
             match_str,
             events,
             connection,
@@ -40,12 +41,11 @@ impl Stream for MessageStream {
 
 impl Drop for MessageStream {
     fn drop(&mut self) {
-        let msg_match = self.msg_match.take().unwrap();
         // Remove the local filter now, before `events` is dropped. Otherwise a signal arriving in
         // between finds the receiver gone, and dbus-rs removes the filter by itself, so a later
         // `remove_match` would fail before it reached the daemon (#419).
-        self.connection.stop_receive(msg_match.token());
-        let Ok(runtime) = tokio::runtime::Handle::try_current() else {
+        self.connection.stop_receive(self.msg_match.token());
+        let Ok(runtime) = Handle::try_current() else {
             warn!(
                 "No Tokio runtime to remove the D-Bus match {} token for a dropped stream",
                 self.match_str,
