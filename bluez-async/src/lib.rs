@@ -309,9 +309,9 @@ impl BluetoothSession {
         let (close, closed) = oneshot::channel();
         let task_connection = connection.clone();
         let dbus_handle = tokio::spawn(async move {
-            // `IOResource` drops its connection before its reactor registration. Hold another
-            // reference, dropped after the resource, so the socket stays open until it has been
-            // deregistered.
+            // `IOResource` drops its `Arc<SyncConnection>` before its reactor registration, and once
+            // every session and stream is gone that `Arc` is the last one, so the socket would close
+            // before it is deregistered. This reference outlives the resource and keeps it open.
             let _connection = task_connection;
             let resource = pin!(dbus_resource);
             match future::select(resource, closed).await {
