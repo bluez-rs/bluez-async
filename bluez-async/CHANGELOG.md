@@ -4,6 +4,12 @@
 
 ### Bugfixes
 
+- The join handle returned by `BluetoothSession::new` can now complete with `Ok(())`: dropping a
+  session, all its clones and every event stream obtained from them closes its D-Bus connection.
+  Previously the task driving the connection ran until the connection was lost, so every session
+  leaked a system bus connection. Code that treats any completion of the handle as a lost
+  connection should check for `Ok(())`.
+
 - Dropping an event stream no longer panics when its D-Bus match can't be removed. A signal
   arriving while the stream was being dropped made the removal fail and left the match registered
   with the D-Bus daemon; the stream now removes its local filter before that can happen and the
